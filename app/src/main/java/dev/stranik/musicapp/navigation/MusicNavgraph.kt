@@ -28,17 +28,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import dev.stranik.musicapp.presentation.ui.screen.AccountScreen
+import dev.stranik.musicapp.presentation.ui.screen.ArtistDetailScreen
 import dev.stranik.musicapp.presentation.ui.screen.LoginScreen
 import dev.stranik.musicapp.presentation.ui.screen.HomeScreen
 import dev.stranik.musicapp.presentation.ui.screen.LibraryScreen
 import dev.stranik.musicapp.presentation.ui.screen.PlayerScreen
+import dev.stranik.musicapp.presentation.ui.screen.PlaylistDetailScreen
 import dev.stranik.musicapp.presentation.ui.screen.RegistrationScreen
 import dev.stranik.musicapp.presentation.ui.screen.SearchScreen
 import dev.stranik.musicapp.presentation.viewmodel.AccountViewModel
+import dev.stranik.musicapp.presentation.viewmodel.ArtistDetailViewModel
 import dev.stranik.musicapp.presentation.viewmodel.HomeViewModel
 import dev.stranik.musicapp.presentation.viewmodel.LibraryViewModel
 import dev.stranik.musicapp.presentation.viewmodel.LoginViewModel
 import dev.stranik.musicapp.presentation.viewmodel.PlayerViewModel
+import dev.stranik.musicapp.presentation.viewmodel.PlaylistDetailViewModel
 import dev.stranik.musicapp.presentation.viewmodel.RegistrationViewModel
 import dev.stranik.musicapp.presentation.viewmodel.SearchViewModel
 
@@ -213,15 +217,33 @@ fun MusicNavGraph(
                 route = Screen.ArtistDetail.ROUTE,
                 arguments = listOf(navArgument("artistId") { type = NavType.StringType })
             ) { backStackEntry ->
-                backStackEntry.arguments?.getString("artistId") ?: return@composable
-                // ArtistDetailScreen(artistId = ..., viewModel = hiltViewModel())
+                val artistId = backStackEntry.arguments?.getString("artistId") ?: return@composable
+                val artistDetailViewModel = viewModel<ArtistDetailViewModel>(
+                    key = artistId,
+                    factory = ArtistDetailViewModel.getViewModelFactory(artistId)
+                )
+
+                ArtistDetailScreen(
+                    viewModel = artistDetailViewModel,
+                    onBack = { navController.popBackStack() },
+                    onTrackClick = playerViewModel::play
+                )
             }
             composable(
                 route = Screen.PlaylistDetail.ROUTE,
                 arguments = listOf(navArgument("playlistId") { type = NavType.StringType })
             ) { backStackEntry ->
-                backStackEntry.arguments?.getString("playlistId") ?: return@composable
-                // PlaylistDetailScreen(playlistId = ..., viewModel = hiltViewModel())
+                val playlistId = backStackEntry.arguments?.getString("playlistId") ?: return@composable
+                val playlistDetailViewModel = viewModel<PlaylistDetailViewModel>(
+                    key = playlistId,
+                    factory = PlaylistDetailViewModel.getViewModelFactory(playlistId)
+                )
+
+                PlaylistDetailScreen(
+                    viewModel = playlistDetailViewModel,
+                    onBack = { navController.popBackStack() },
+                    onTrackClick = playerViewModel::play
+                )
             }
         }
     }
