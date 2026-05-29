@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MusicApp</string>
+    <string name="cover_name">Обложка %s</string>
+    <string name="pause">Пауза</string>
+    <string name="play">Возпроизвести</string>
+    <string name="next">Следующий</string>
+    <string name="liked_track">Любимый трек</string>
+    <string name="options">Опции</string>
+</resources>
