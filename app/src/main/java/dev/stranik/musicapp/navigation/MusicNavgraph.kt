@@ -27,16 +27,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import dev.stranik.musicapp.presentation.ui.screen.AccountScreen
+import dev.stranik.musicapp.presentation.ui.screen.LoginScreen
 import dev.stranik.musicapp.presentation.ui.screen.HomeScreen
 import dev.stranik.musicapp.presentation.ui.screen.LibraryScreen
 import dev.stranik.musicapp.presentation.ui.screen.PlayerScreen
+import dev.stranik.musicapp.presentation.ui.screen.RegistrationScreen
 import dev.stranik.musicapp.presentation.ui.screen.SearchScreen
+import dev.stranik.musicapp.presentation.viewmodel.AccountViewModel
 import dev.stranik.musicapp.presentation.viewmodel.HomeViewModel
 import dev.stranik.musicapp.presentation.viewmodel.LibraryViewModel
+import dev.stranik.musicapp.presentation.viewmodel.LoginViewModel
 import dev.stranik.musicapp.presentation.viewmodel.PlayerViewModel
+import dev.stranik.musicapp.presentation.viewmodel.RegistrationViewModel
 import dev.stranik.musicapp.presentation.viewmodel.SearchViewModel
 
 sealed class Screen(val route: String) {
+    object Login : Screen("login")
+    object Registration : Screen("registration")
+    object Account : Screen("account")
     object Home : Screen("home")
     object Search : Screen("search")
     object Library : Screen("library")
@@ -63,13 +72,18 @@ private val bottomNavItems = listOf(
     BottomNavItem(Screen.Home, "Главная", Icons.Default.Home),
     BottomNavItem(Screen.Search, "Поиск", Icons.Default.Search),
     BottomNavItem(Screen.Library, "Медиатека", Icons.Default.LibraryMusic),
-    BottomNavItem(Screen.Library, "Аккаунт", Icons.Default.AccountCircle),
+    BottomNavItem(Screen.Account, "Аккаунт", Icons.Default.AccountCircle),
 )
+
+private val authRoutes = setOf(Screen.Login.route, Screen.Registration.route)
 
 @Composable
 fun MusicNavGraph(
     context: Context, navController: NavHostController
 ) {
+    val loginViewModel = viewModel<LoginViewModel>(factory = LoginViewModel.getViewModelFactory(context))
+    val registrationViewModel = viewModel<RegistrationViewModel>(factory = RegistrationViewModel.getViewModelFactory(context))
+    val accountViewModel = viewModel<AccountViewModel>(factory = AccountViewModel.getViewModelFactory(context))
     val homeViewModel = viewModel<HomeViewModel>(factory = HomeViewModel.getViewModelFactory(context))
     val libraryViewModel = viewModel<LibraryViewModel>(factory = LibraryViewModel.getViewModelFactory(context))
     val playerViewModel = viewModel<PlayerViewModel>(factory = PlayerViewModel.getViewModelFactory(context))
@@ -77,29 +91,72 @@ fun MusicNavGraph(
 
     val playerState by playerViewModel.uiState.collectAsState()
     val currentRoute by navController.currentBackStackEntryAsState()
+    val route = currentRoute?.destination?.route
+    val showBottomBar = route !in authRoutes
 
     Scaffold(
         bottomBar = {
-            Column {
-                // Мини-плеер над bottom bar
-                if (playerState.currentTrack != null &&
-                    currentRoute?.destination?.route != Screen.Player.route
-                ) {
-                    MiniPlayer(
-                        state = playerState,
-                        onPlayPause = playerViewModel::onPlayPause,
-                        onClick = { navController.navigate(Screen.Player.route) }
-                    )
+            if (showBottomBar) {
+                Column {
+                    // Мини-плеер над bottom bar
+                    if (playerState.currentTrack != null &&
+                        route != Screen.Player.route
+                    ) {
+                        MiniPlayer(
+                            state = playerState,
+                            onPlayPause = playerViewModel::onPlayPause,
+                            onClick = { navController.navigate(Screen.Player.route) }
+                        )
+                    }
+                    BottomNavBar(navController = navController)
                 }
-                BottomNavBar(navController = navController)
             }
         }
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Home.route,
+            startDestination = Screen.Login.route,
             modifier = Modifier.padding(padding)
         ) {
+            composable(Screen.Login.route) {
+                LoginScreen(
+                    viewModel = loginViewModel,
+                    onLoginSuccess = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateToRegistration = {
+                        navController.navigate(Screen.Registration.route)
+                    }
+                )
+            }
+            composable(Screen.Registration.route) {
+                RegistrationScreen(
+                    viewModel = registrationViewModel,
+                    onRegistrationSuccess = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Registration.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(Screen.Account.route) {
+                AccountScreen(
+                    viewModel = accountViewModel,
+                    onLogout = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onEdit = {
+                        navController.navigate(Screen.Registration.route)
+                    }
+                )
+            }
             composable(Screen.Home.route) {
                 HomeScreen(
                     viewModel = homeViewModel,
@@ -156,16 +213,15 @@ fun MusicNavGraph(
                 route = Screen.ArtistDetail.ROUTE,
                 arguments = listOf(navArgument("artistId") { type = NavType.StringType })
             ) { backStackEntry ->
-                val artistId = backStackEntry.arguments?.getString("artistId") ?: return@composable
-                // ArtistDetailScreen(artistId = artistId, viewModel = hiltViewModel())
+                backStackEntry.arguments?.getString("artistId") ?: return@composable
+                // ArtistDetailScreen(artistId = ..., viewModel = hiltViewModel())
             }
             composable(
                 route = Screen.PlaylistDetail.ROUTE,
                 arguments = listOf(navArgument("playlistId") { type = NavType.StringType })
             ) { backStackEntry ->
-                val playlistId =
-                    backStackEntry.arguments?.getString("playlistId") ?: return@composable
-                // PlaylistDetailScreen(playlistId = playlistId, viewModel = hiltViewModel())
+                backStackEntry.arguments?.getString("playlistId") ?: return@composable
+                // PlaylistDetailScreen(playlistId = ..., viewModel = hiltViewModel())
             }
         }
     }
