@@ -20,8 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import dev.stranik.musicapp.R
+import dev.stranik.musicapp.presentation.common.UiText
+import dev.stranik.musicapp.presentation.viewmodel.AccountUiState
 import dev.stranik.musicapp.presentation.viewmodel.AccountViewModel
 
 @Composable
@@ -39,7 +44,6 @@ fun AccountScreen(
 		verticalArrangement = Arrangement.Top,
 		horizontalAlignment = Alignment.Start
 	) {
-		// Avatar: круглая иконка с первой буквой username (или '?' если нет)
 		Box(
 			modifier = Modifier
 				.size(96.dp)
@@ -48,17 +52,11 @@ fun AccountScreen(
 				.background(MaterialTheme.colorScheme.primary),
 			contentAlignment = Alignment.Center
 		) {
-			val avatarChar = state.username?.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
-			Text(
-				text = avatarChar,
-				style = MaterialTheme.typography.headlineMedium,
-				color = MaterialTheme.colorScheme.onPrimary,
-				textAlign = TextAlign.Center
-			)
+			MakeAvatar(state)
 		}
 
 		Spacer(modifier = Modifier.height(24.dp))
-		// Заголовок по центру
+
 		Text(
 			text = "Аккаунт",
 			style = MaterialTheme.typography.headlineMedium,
@@ -72,13 +70,14 @@ fun AccountScreen(
 		Text(text = "Email: ${state.email}", modifier = Modifier.align(Alignment.CenterHorizontally))
 
 		Spacer(modifier = Modifier.height(24.dp))
-		// Кнопки по центру
+
 		Button(
 			onClick = onEdit,
 			modifier = Modifier.align(Alignment.CenterHorizontally)
 		) { Text("Редактировать") }
 
 		Spacer(modifier = Modifier.height(12.dp))
+
 		Button(
 			onClick = {
 				viewModel.logout()
@@ -87,4 +86,27 @@ fun AccountScreen(
 			modifier = Modifier.align(Alignment.CenterHorizontally)
 		) { Text("Выйти") }
 	}
+}
+
+@Composable
+fun MakeAvatar(state: AccountUiState) {
+	val avatarChar = state.username.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+
+	if (state.avatarUrl == null) {
+		Text(
+			text = avatarChar,
+			style = MaterialTheme.typography.headlineMedium,
+			color = MaterialTheme.colorScheme.onPrimary,
+			textAlign = TextAlign.Center
+		)
+
+		return
+	}
+
+	AsyncImage(
+		model = state.avatarUrl,
+		contentDescription = avatarChar,
+		contentScale = ContentScale.Crop,
+		modifier = Modifier.fillMaxSize()
+	)
 }

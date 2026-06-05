@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import dev.stranik.musicapp.domain.Creator
+import dev.stranik.musicapp.domain.usecase.LoginUseCase
+import dev.stranik.musicapp.presentation.mapper.SearchUiMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,10 +24,9 @@ data class LoginUiState(
 	val success: Boolean = false
 )
 
-class LoginViewModel(context: Context) : ViewModel() {
-
-	private val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-
+class LoginViewModel(
+	private val loginUseCase: LoginUseCase
+) : ViewModel() {
 	private val _uiState = MutableStateFlow(LoginUiState())
 	val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
@@ -40,37 +42,25 @@ class LoginViewModel(context: Context) : ViewModel() {
 		viewModelScope.launch {
 			_uiState.value = _uiState.value.copy(isLoading = true, error = null, success = false)
 
-			val storedEmail = prefs.getString("email", null)
-			val storedPassword = prefs.getString("password", null)
+			val result = loginUseCase(_uiState.value.email, _uiState.value.password)
 
-			// Простая синхронная проверка
-			if (storedEmail == null || storedPassword == null) {
-				_uiState.value = _uiState.value.copy(
-					isLoading = false,
-					error = "Пользователь не зарегистрирован"
-				)
+			if (result.isFailure) {
+				_uiState.value = _uiState.value.copy(isLoading = false, error = "Ошибка при входе: ${result.exceptionOrNull()?.message}")
 				return@launch
 			}
 
-			val a = _uiState.value.email
-			val b = _uiState.value.password
-
-			Log.i("LoginViewModel", "Stored email: $storedEmail, Stored password: $storedPassword")
-			Log.i("LoginViewModel", "Stored email: $a, Stored password: $b")
-
-			if (storedEmail == _uiState.value.email && storedPassword == _uiState.value.password) {
-				prefs.edit().putBoolean("is_logged", true).apply()
-				_uiState.value = _uiState.value.copy(isLoading = false, success = true)
-			} else {
-				_uiState.value = _uiState.value.copy(isLoading = false, error = "Неверный email или пароль")
-			}
+			_uiState.value = _uiState.value.copy(isLoading = false, success = true)
 		}
 	}
 
 	companion object {
 		fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
 			initializer {
-				LoginViewModel(context)
+				val tokenManager = Creator.provideTokenManager(context)
+				val authRepository = Creator.provideAuthRepository(tokenManager)
+				val login = Creator.provideLoginUseCase(authRepository)
+
+				LoginViewModel(login)
 			}
 		}
 	}
