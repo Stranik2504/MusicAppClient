@@ -9,4 +9,5 @@ interface LibraryRepository {
     suspend fun createPlaylist(title: String, description: String?): Result<Playlist>
     suspend fun addTrackToPlaylist(playlistId: String, trackId: String): Result<Unit>
     suspend fun removeTrackFromPlaylist(playlistId: String, trackId: String): Result<Unit>
+    suspend fun getPlaylist(playlistId: String): Result<Playlist>
 }

@@ -78,4 +78,11 @@ class LibraryRepositoryImpl : LibraryRepository {
         if (res.status != HttpStatusCode.OK && res.status != HttpStatusCode.NoContent)
             throw Exception("Failed to remove track from playlist: ${res.status}")
     }
+
+    override suspend fun getPlaylist(playlistId: String): Result<Playlist> = runCatching {
+        val playlistRes = PlaylistApiService.getPlaylist(playlistId.toLong())
+        if (playlistRes.status != HttpStatusCode.OK)
+            throw Exception("Failed to get playlist $playlistId")
+        playlistRes.value.toDomain()
+    }
 }

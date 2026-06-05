@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface PlayerRepository {
     val playerState: Flow<PlayerState>
     suspend fun playTrack(track: Track, hlsUrl: String)
+    suspend fun playTracks(tracks: List<Track>, initialTrackIndex: Int, hlsUrls: List<String>)
     suspend fun pause()
     suspend fun resume()
     suspend fun seekTo(positionMs: Long)

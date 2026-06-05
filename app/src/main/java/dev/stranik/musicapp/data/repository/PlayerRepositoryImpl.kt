@@ -148,29 +148,48 @@ class PlayerRepositoryImpl(private val context: Context) : PlayerRepository {
     override suspend fun playTrack(track: Track, hlsUrl: String) {
         val player = controller ?: return
         
+        val mediaItem = createMediaItem(track, hlsUrl)
+        
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+    }
+
+    @OptIn(UnstableApi::class)
+    override suspend fun playTracks(tracks: List<Track>, initialTrackIndex: Int, hlsUrls: List<String>) {
+        val player = controller ?: return
+        
+        val mediaItems = tracks.mapIndexed { index, track ->
+            createMediaItem(track, hlsUrls[index])
+        }
+
+        player.setMediaItems(mediaItems)
+        player.seekTo(initialTrackIndex, 0)
+        player.prepare()
+        player.play()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun createMediaItem(track: Track, hlsUrl: String): MediaItem {
         val extras = Bundle().apply {
             putBoolean("is_liked", track.isLiked)
         }
 
-        var mediaData = MediaMetadata.Builder()
+        var mediaMetadata = MediaMetadata.Builder()
             .setTitle(track.title)
             .setArtist(track.artistName)
             .setAlbumTitle(track.albumTitle)
             .setExtras(extras)
 
         if (track.coverUrl.isNotEmpty())
-            mediaData = mediaData.setArtworkUri(track.coverUrl.toUri())
+            mediaMetadata = mediaMetadata.setArtworkUri(track.coverUrl.toUri())
 
-        val mediaItem = MediaItem.Builder()
+        return MediaItem.Builder()
             .setMediaId(track.id)
             .setUri(hlsUrl)
             .setMimeType(MimeTypes.APPLICATION_M3U8)
-            .setMediaMetadata(mediaData.build())
+            .setMediaMetadata(mediaMetadata.build())
             .build()
-        
-        player.setMediaItem(mediaItem)
-        player.prepare()
-        player.play()
     }
 
     override suspend fun pause() {

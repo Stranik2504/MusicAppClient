@@ -27,6 +27,7 @@ import dev.stranik.musicapp.domain.usecase.LoginUseCase
 import dev.stranik.musicapp.domain.usecase.LogoutUseCase
 import dev.stranik.musicapp.domain.usecase.ObservePlayerStateUseCase
 import dev.stranik.musicapp.domain.usecase.PauseTrackUseCase
+import dev.stranik.musicapp.domain.usecase.PlayPlaylistUseCase
 import dev.stranik.musicapp.domain.usecase.PlayTrackUseCase
 import dev.stranik.musicapp.domain.usecase.RegistrationUseCase
 import dev.stranik.musicapp.domain.usecase.RemoveTrackFromPlaylistUseCase
@@ -78,6 +79,7 @@ object Creator {
     fun provideObservePlayerState(playerRepository: PlayerRepository): ObservePlayerStateUseCase = ObservePlayerStateUseCase(playerRepository)
     fun providePauseTrack(playerRepository: PlayerRepository): PauseTrackUseCase = PauseTrackUseCase(playerRepository)
     fun providePlayTrack(playerRepository: PlayerRepository, trackRepository: TrackRepository): PlayTrackUseCase = PlayTrackUseCase(playerRepository, trackRepository)
+    fun providePlayPlaylistUseCase(playerRepository: PlayerRepository, trackRepository: TrackRepository): PlayPlaylistUseCase = PlayPlaylistUseCase(playerRepository, trackRepository)
     fun provideSearch(): SearchUseCase = SearchUseCase()
     fun provideSeek(playerRepository: PlayerRepository): SeekUseCase = SeekUseCase(playerRepository)
     fun provideSkipNext(playerRepository: PlayerRepository): SkipNextUseCase = SkipNextUseCase(playerRepository)
