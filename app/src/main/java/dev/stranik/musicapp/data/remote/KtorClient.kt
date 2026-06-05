@@ -12,8 +12,6 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.request.HttpRequestPipeline
-import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -40,13 +38,13 @@ object KtorClient {
             socketTimeoutMillis = 15000
         }
 
-        install("TokenInterceptor") {
+        /*install("TokenInterceptor") {
             requestPipeline.intercept(HttpRequestPipeline.State) {
                 currentAccessToken?.let { token ->
                     context.header("Authorization", "Bearer $token")
                 }
             }
-        }
+        }*/
 
         install(Auth) {
             bearer {
@@ -63,16 +61,18 @@ object KtorClient {
         }
 
         defaultRequest {
-            url("https://musicapp.stranik.dev/")
-            // url("http://192.168.1.11:8080/")
+            // url("https://musicapp.stranik.dev/")
+            url("http://192.168.1.11:8080/")
         }
     }
 
     fun updateAccessToken(token: String) {
         currentAccessToken = token
+        client = buildClient()
     }
 
     fun clearTokens() {
         currentAccessToken = null
+        client = buildClient()
     }
 }

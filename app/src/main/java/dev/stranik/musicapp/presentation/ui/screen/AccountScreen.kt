@@ -1,5 +1,6 @@
 package dev.stranik.musicapp.presentation.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,18 +15,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import dev.stranik.musicapp.R
-import dev.stranik.musicapp.presentation.common.UiText
 import dev.stranik.musicapp.presentation.viewmodel.AccountUiState
 import dev.stranik.musicapp.presentation.viewmodel.AccountViewModel
 
@@ -36,6 +35,10 @@ fun AccountScreen(
 	onEdit: () -> Unit
 ) {
 	val state by viewModel.uiState.collectAsState()
+
+	LaunchedEffect(Unit) {
+		viewModel.loadAccount()
+	}
 
 	Column(
 		modifier = Modifier
@@ -58,7 +61,7 @@ fun AccountScreen(
 		Spacer(modifier = Modifier.height(24.dp))
 
 		Text(
-			text = "Аккаунт",
+			text = (if (state.isLogged) "Аккаунт" else "Не авторизован"),
 			style = MaterialTheme.typography.headlineMedium,
 			modifier = Modifier.align(Alignment.CenterHorizontally)
 		)
@@ -102,6 +105,8 @@ fun MakeAvatar(state: AccountUiState) {
 
 		return
 	}
+
+	Log.i("te", state.avatarUrl)
 
 	AsyncImage(
 		model = state.avatarUrl,

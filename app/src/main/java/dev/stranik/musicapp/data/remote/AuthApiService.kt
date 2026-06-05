@@ -1,6 +1,5 @@
 package dev.stranik.musicapp.data.remote
 
-import android.util.Log
 import dev.stranik.musicapp.data.model.LoginRequestDto
 import dev.stranik.musicapp.data.model.LoginResponseDto
 import dev.stranik.musicapp.data.model.Res
@@ -17,10 +16,6 @@ object AuthApiService {
             contentType(ContentType.Application.Json)
             setBody(LoginRequestDto(username = username, password = password))
         }
-
-        Log.d("register", result.body())
-        Log.d("register", ("$username $password"))
-        Log.d("register", result.toString())
 
         return Res(result.status, result.body())
     }

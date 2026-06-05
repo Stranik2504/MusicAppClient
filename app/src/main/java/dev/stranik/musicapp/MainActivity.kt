@@ -4,20 +4,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import dev.stranik.musicapp.data.local.TokenManager
+import dev.stranik.musicapp.data.remote.KtorClient
 import dev.stranik.musicapp.navigation.MusicNavGraph
 import dev.stranik.musicapp.ui.theme.MusicAppTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val tokenManager = TokenManager(applicationContext)
+
+        lifecycleScope.launch {
+            tokenManager.accessTokenFlow.first()?.let { token ->
+                KtorClient.updateAccessToken(token)
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             MusicAppTheme {
