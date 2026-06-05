@@ -111,6 +111,8 @@ fun MusicNavGraph(
                         MiniPlayer(
                             state = playerState,
                             onPlayPause = playerViewModel::onPlayPause,
+                            onSkipNext = playerViewModel::onSkipNext,
+                            onSkipPrevious = playerViewModel::onSkipPrevious,
                             onClick = { navController.navigate(Screen.Player.route) }
                         )
                     }
