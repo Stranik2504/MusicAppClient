@@ -170,7 +170,7 @@ fun MusicNavGraph(
                 val homeViewModel = viewModel<HomeViewModel>(factory = HomeViewModel.getViewModelFactory(context))
                 HomeScreen(
                     viewModel = homeViewModel,
-                    onTrackClick = playerViewModel::play,
+                    onTrackClick = { track -> playerViewModel.play(track.id) },
                     onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) },
                     onAlbumClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id)) }
                 )
@@ -179,7 +179,7 @@ fun MusicNavGraph(
                 val searchViewModel = viewModel<SearchViewModel>(factory = SearchViewModel.getViewModelFactory(context))
                 SearchScreen(
                     viewModel = searchViewModel,
-                    onTrackClick = playerViewModel::play,
+                    onTrackClick = { track -> playerViewModel.play(track.id) },
                     onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) }
                 )
             }
@@ -188,7 +188,7 @@ fun MusicNavGraph(
                 LibraryScreen(
                     viewModel = libraryViewModel,
                     onPlaylistClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id)) },
-                    onTrackClick = playerViewModel::play
+                    onTrackClick = { track -> playerViewModel.play(track.id) }
                 )
             }
             composable(Screen.Player.route) {
@@ -210,7 +210,7 @@ fun MusicNavGraph(
                 ArtistDetailScreen(
                     viewModel = artistDetailViewModel,
                     onBack = { navController.popBackStack() },
-                    onTrackClick = playerViewModel::play
+                    onTrackClick = { track -> playerViewModel.play(track.id) }
                 )
             }
             composable(
@@ -226,7 +226,7 @@ fun MusicNavGraph(
                 PlaylistDetailScreen(
                     viewModel = playlistDetailViewModel,
                     onBack = { navController.popBackStack() },
-                    onTrackClick = playerViewModel::play
+                    onTrackClick = { track -> playerViewModel.play(track.id) }
                 )
             }
         }

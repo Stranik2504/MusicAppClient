@@ -82,4 +82,12 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    // Media3 for HLS and Background Playback
+    val media3Version = "1.5.0"
+    implementation("androidx.media3:media3-exoplayer:$media3Version")
+    implementation("androidx.media3:media3-exoplayer-hls:$media3Version")
+    implementation("androidx.media3:media3-session:$media3Version")
+    implementation("androidx.media3:media3-ui:$media3Version")
 }

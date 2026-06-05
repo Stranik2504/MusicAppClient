@@ -5,5 +5,6 @@ data class Playlist(
     val title: String,
     val coverUrl: String,
     val trackCount: Int,
-    val isPublic: Boolean
+    val isPublic: Boolean,
+    val trackIds: List<String> = emptyList()
 )

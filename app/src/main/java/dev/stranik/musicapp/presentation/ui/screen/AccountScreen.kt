@@ -106,8 +106,6 @@ fun MakeAvatar(state: AccountUiState) {
 		return
 	}
 
-	Log.i("te", state.avatarUrl)
-
 	AsyncImage(
 		model = state.avatarUrl,
 		contentDescription = avatarChar,

@@ -1,10 +1,12 @@
 package dev.stranik.musicapp.domain.usecase
 
-class CreatePlaylistUseCase {
-    operator fun invoke(title: String) {
-        // В реальном приложении здесь был бы вызов репозитория.
-        // Для фейковых данных не нужно ничего делать.
+import dev.stranik.musicapp.domain.model.Playlist
+import dev.stranik.musicapp.domain.repository.LibraryRepository
+
+class CreatePlaylistUseCase(
+    private val repository: LibraryRepository
+) {
+    suspend operator fun invoke(title: String, description: String? = null): Result<Playlist> {
+        return repository.createPlaylist(title, description)
     }
 }
-
-

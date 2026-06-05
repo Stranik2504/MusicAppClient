@@ -1,8 +1,11 @@
 package dev.stranik.musicapp.domain.usecase
 
-class PauseTrackUseCase {
-    operator fun invoke() {
-        // Заглушка
+import dev.stranik.musicapp.domain.repository.PlayerRepository
+
+class PauseTrackUseCase(
+    private val playerRepository: PlayerRepository
+) {
+    suspend operator fun invoke() {
+        playerRepository.pause()
     }
 }
-
