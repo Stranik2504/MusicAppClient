@@ -16,8 +16,8 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object KtorClient {
-    val BASE_URL = "http://192.168.1.11:8080"
-    // val BASE_URL = "https://musicapp.stranik.dev/"
+    // val BASE_URL = "http://192.168.1.11:8080"
+    val BASE_URL = "https://musicapp.stranik.dev/"
 
     private var currentAccessToken: String? = null
     var client = buildClient()

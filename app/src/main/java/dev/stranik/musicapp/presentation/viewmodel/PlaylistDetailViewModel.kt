@@ -7,8 +7,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import dev.stranik.musicapp.domain.model.Playlist
 import dev.stranik.musicapp.domain.model.Track
-import dev.stranik.musicapp.domain.repository.LibraryRepository
-import dev.stranik.musicapp.domain.repository.TrackRepository
 import dev.stranik.musicapp.domain.usecase.AddTrackToPlaylistUseCase
 import dev.stranik.musicapp.domain.usecase.GetAlbumUseCase
 import dev.stranik.musicapp.domain.usecase.GetPlaylistUseCase
@@ -72,7 +70,7 @@ class PlaylistDetailViewModel(
             getUserPlaylistsUseCase()
                 .onSuccess { playlists ->
                     _uiState.update { it.copy(playlists = playlists) }
-                };
+                }
         }
     }
 
@@ -92,7 +90,7 @@ class PlaylistDetailViewModel(
             getUserPlaylistsUseCase()
             .onSuccess { playlists ->
                 _uiState.update { it.copy(playlists = playlists) }
-            };
+            }
         }
     }
 
@@ -102,7 +100,7 @@ class PlaylistDetailViewModel(
 
         trackIds.forEach { id ->
             getTrackUseCase(id.toLong())
-                .onSuccess { tracks.add(it) }
+                .onSuccess { if (!tracks.any { it.id != id }) tracks.add(it) }
                 .onFailure { hasError = true }
         }
 
