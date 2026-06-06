@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ArtistDto(
+    val id: Long,
     val name: String,
     val bio: String,
     val avatarUrl: String,

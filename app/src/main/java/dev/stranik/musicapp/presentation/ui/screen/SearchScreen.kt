@@ -31,11 +31,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Track
+import dev.stranik.musicapp.presentation.common.UiText
 import dev.stranik.musicapp.presentation.ui.component.ArtistCard
 import dev.stranik.musicapp.presentation.ui.component.TrackItem
 import dev.stranik.musicapp.presentation.viewmodel.SearchUiState
@@ -78,6 +82,7 @@ fun SearchScreen(
             is SearchUiState.Idle -> SearchIdleContent()
             is SearchUiState.Loading -> SearchLoadingContent()
             is SearchUiState.Success -> SearchResultsContent(
+                viewModel = viewModel,
                 state = s,
                 onTrackClick = onTrackClick,
                 onArtistClick = onArtistClick
@@ -117,6 +122,7 @@ private fun SearchBar(
 
 @Composable
 private fun SearchResultsContent(
+    viewModel: SearchViewModel,
     state: SearchUiState.Success,
     onTrackClick: (Track) -> Unit,
     onArtistClick: (String) -> Unit
@@ -130,11 +136,14 @@ private fun SearchResultsContent(
             item {
                 SearchSectionTitle("Треки")
             }
-            items(state.tracks.take(5), key = { it.id }) { track ->
+            items(state.tracks.take(5), key = { "track_" + it.id }) { track ->
                 TrackItem(
                     track = track,
+                    playlists = state.playlists,
                     onClick = { onTrackClick(track) },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onToggleLike = { viewModel.toggleLike(track) },
+                    onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
                 )
             }
         }
@@ -147,7 +156,7 @@ private fun SearchResultsContent(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(state.artists, key = { it.id }) { artist ->
+                    items(state.artists, key = { "artist_" + it.id }) { artist ->
                         ArtistCard(
                             artist = artist,
                             onClick = { onArtistClick(artist.id) }
@@ -160,7 +169,7 @@ private fun SearchResultsContent(
         // Альбомы
         if (state.albums.isNotEmpty()) {
             item { SearchSectionTitle("Альбомы") }
-            items(state.albums, key = { it.id }) { album ->
+            items(state.albums, key = { "album_" + it.id }) { album ->
                 AlbumListItem(album = album, modifier = Modifier.padding(horizontal = 16.dp))
             }
         }
@@ -187,7 +196,15 @@ private fun AlbumListItem(album: Album, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Card(shape = RoundedCornerShape(8.dp), modifier = Modifier.size(52.dp)) {
-            // AsyncImage(model = album.coverUrl, ...)
+            AsyncImage(
+                model = album.coverUrl,
+                contentDescription = UiText.StringResource(
+                    R.string.cover_name,
+                    album.title
+                ).asString(),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         Column {
             Text(album.title, style = MaterialTheme.typography.bodyLarge)

@@ -1,7 +1,6 @@
 package dev.stranik.musicapp.presentation.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,12 +8,10 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import dev.stranik.musicapp.domain.Creator
 import dev.stranik.musicapp.domain.usecase.LoginUseCase
-import dev.stranik.musicapp.presentation.mapper.SearchUiMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.logging.Logger
 
 data class LoginUiState(
 	val email: String = "",

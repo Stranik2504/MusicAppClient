@@ -109,7 +109,10 @@ fun PlaylistDetailScreen(
                 items(state.tracks, key = { it.id }) { track ->
                     TrackItem(
                         track = track,
-                        onClick = { viewModel.playTrack(track) }
+                        playlists = state.playlists,
+                        onClick = { viewModel.playTrack(track) },
+                        onToggleLike = { viewModel.toggleLike(track) },
+                        onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
                     )
                 }
             } else if (!state.isLoading && state.error == null) {

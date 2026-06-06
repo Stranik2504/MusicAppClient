@@ -11,7 +11,6 @@ import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.domain.usecase.ObservePlayerStateUseCase
 import dev.stranik.musicapp.domain.usecase.PlayTrackUseCase
 import dev.stranik.musicapp.domain.usecase.SeekUseCase
-import dev.stranik.musicapp.presentation.mapper.PlayerUiMapper
 import dev.stranik.musicapp.domain.usecase.PauseTrackUseCase
 import dev.stranik.musicapp.domain.usecase.SkipNextUseCase
 import dev.stranik.musicapp.domain.usecase.SkipPreviousUseCase
@@ -20,6 +19,7 @@ import dev.stranik.musicapp.domain.usecase.UnlikeTrackUseCase
 import dev.stranik.musicapp.domain.usecase.SetRepeatModeUseCase
 import dev.stranik.musicapp.domain.usecase.SetShuffleUseCase
 import dev.stranik.musicapp.domain.usecase.UpdatePlayerLikeStatusUseCase
+import dev.stranik.musicapp.presentation.mapper.toUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,7 +68,6 @@ class PlayerViewModel(
     private val setShuffleUseCase: SetShuffleUseCase,
     private val updatePlayerLikeStatusUseCase: UpdatePlayerLikeStatusUseCase,
     private val playerStateUseCase: ObservePlayerStateUseCase,
-    private val playerUiMapper: PlayerUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlayerUiState())
@@ -81,7 +80,7 @@ class PlayerViewModel(
     private fun observePlayerState() {
         viewModelScope.launch {
             playerStateUseCase().collect { playerState ->
-                _uiState.value = playerUiMapper.toUiState(playerState)
+                _uiState.value = playerState.toUiState()
             }
         }
     }
@@ -183,7 +182,6 @@ class PlayerViewModel(
                     setShuffleUseCase = setShuffle,
                     updatePlayerLikeStatusUseCase = updateLikeStatus,
                     playerStateUseCase = observePlayerState,
-                    playerUiMapper = PlayerUiMapper(),
                 )
             }
         }

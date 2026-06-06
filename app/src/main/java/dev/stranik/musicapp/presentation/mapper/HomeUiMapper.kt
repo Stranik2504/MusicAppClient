@@ -5,6 +5,7 @@ import dev.stranik.musicapp.data.model.ArtistDetailsDto
 import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Artist
 import dev.stranik.musicapp.domain.model.Playlist
+import dev.stranik.musicapp.domain.model.Track
 
 fun AlbumDto.toDomain() = Album(
     id = id.toString(),
@@ -30,6 +31,7 @@ fun ArtistDetailsDto.toDomain() = Artist(
     id = id.toString(),
     name = name,
     avatarUrl = avatarUrl,
+    topTracks = topTracks.map { it.id },
     monthlyListenersFormatted = formatMonthlyListeners(monthlyListeners)
 )
 

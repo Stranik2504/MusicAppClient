@@ -11,7 +11,7 @@ class AlbumRepositoryImpl : AlbumRepository {
         val albumRes = AlbumsApiService.getAlbum(albumId)
 
         if (albumRes.status != HttpStatusCode.OK)
-            throw Exception("Failed to get liked ids")
+            throw Exception("Failed to get album $albumId")
 
         albumRes.value.toDomain()
     }

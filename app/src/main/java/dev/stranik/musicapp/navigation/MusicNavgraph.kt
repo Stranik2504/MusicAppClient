@@ -229,18 +229,29 @@ fun MusicNavGraph(
                 val trackRepository = Creator.provideTrackRepository()
                 val albumRepository = Creator.provideAlbumRepository()
                 val playerRepository = Creator.providePlayerRepository(context)
+
+                val getPlaylistUseCase = Creator.provideGetPlaylistUseCase(libraryRepository)
                 val playPlaylistUseCase = Creator.providePlayPlaylistUseCase(playerRepository, trackRepository)
                 val getAlbumUseCase = Creator.provideGetAlbum(albumRepository)
+                val getTrackUseCase = Creator.provideGetTrack(trackRepository)
+                val getUserPlaylistsUseCase = Creator.provideGetUserPlaylists(libraryRepository)
+                val unlikeTrackUseCase = Creator.provideUnlikeTrack(trackRepository)
+                val likeTrackUseCase = Creator.provideLikeTrack(trackRepository)
+                val addTrackToPlaylistUseCase = Creator.provideAddTrackToPlaylist(libraryRepository)
 
                 val playlistDetailViewModel = viewModel<PlaylistDetailViewModel>(
                     key = "$playlistId $isPlaylist",
                     factory = PlaylistDetailViewModel.getViewModelFactory(
                         playlistId = playlistId,
                         isPlaylist = isPlaylist,
-                        libraryRepository = libraryRepository,
-                        trackRepository = trackRepository,
+                        getPlaylistUseCase = getPlaylistUseCase,
                         playPlaylistUseCase = playPlaylistUseCase,
-                        getAlbumUseCase
+                        getAlbumUseCase = getAlbumUseCase,
+                        getTrackUseCase = getTrackUseCase,
+                        getUserPlaylistsUseCase = getUserPlaylistsUseCase,
+                        unlikeTrackUseCase = unlikeTrackUseCase,
+                        likeTrackUseCase = likeTrackUseCase,
+                        addTrackToPlaylistUseCase = addTrackToPlaylistUseCase
                     )
                 )
 

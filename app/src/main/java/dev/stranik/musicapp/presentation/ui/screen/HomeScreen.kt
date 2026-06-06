@@ -48,6 +48,7 @@ fun HomeScreen(
             )
 
             else -> HomeContent(
+                viewModel = viewModel,
                 state = state,
                 onTrackClick = onTrackClick,
                 onArtistClick = onArtistClick,
@@ -59,6 +60,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
+    viewModel: HomeViewModel,
     state: HomeUiState,
     onTrackClick: (Track) -> Unit,
     onArtistClick: (String) -> Unit,
@@ -104,7 +106,10 @@ private fun HomeContent(
                 TrackItem(
                     track = track,
                     onClick = { onTrackClick(track) },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    playlists = state.playlists,
+                    onToggleLike = { viewModel.toggleLike(track) },
+                    onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
                 )
             }
         }
@@ -134,7 +139,10 @@ private fun HomeContent(
                 TrackItem(
                     track = track,
                     onClick = { onTrackClick(track) },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    playlists = state.playlists,
+                    onToggleLike = { viewModel.toggleLike(track) },
+                    onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
                 )
             }
         }

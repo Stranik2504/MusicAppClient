@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.stranik.musicapp.domain.model.Playlist
 import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.presentation.ui.component.TrackItem
 import dev.stranik.musicapp.presentation.viewmodel.ArtistDetailViewModel
@@ -46,7 +47,7 @@ fun ArtistDetailScreen(
 		item {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceBetween,
+				horizontalArrangement = Arrangement.Start,
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				IconButton(onClick = onBack) {
@@ -55,9 +56,9 @@ fun ArtistDetailScreen(
 				Text(
 					text = "Артист",
 					style = MaterialTheme.typography.titleMedium,
-					fontWeight = FontWeight.SemiBold
+					fontWeight = FontWeight.SemiBold,
+					modifier = Modifier.padding(start = 8.dp)
 				)
-				Spacer(modifier = Modifier.height(48.dp))
 			}
 		}
 
@@ -65,13 +66,13 @@ fun ArtistDetailScreen(
 			Card(modifier = Modifier.fillMaxWidth()) {
 				Column(modifier = Modifier.padding(16.dp)) {
 					Text(
-						text = state.artist.name,
+						text = state.artist?.name ?: "Артист",
 						style = MaterialTheme.typography.headlineMedium,
 						fontWeight = FontWeight.Bold
 					)
 					Spacer(Modifier.height(8.dp))
 					Text(
-						text = state.artist.monthlyListenersFormatted,
+						text = state.artist?.monthlyListenersFormatted ?: "Кол-во прослушиваний",
 						style = MaterialTheme.typography.bodyMedium,
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
@@ -95,14 +96,11 @@ fun ArtistDetailScreen(
 			items(state.topTracks, key = { it.id }) { track ->
 				TrackItem(
 					track = track,
-					onClick = { onTrackClick(track) }
+					playlists = state.playlists,
+					onClick = { onTrackClick(track) },
+					onToggleLike = { viewModel.toggleLike(track) },
+					onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
 				)
-			}
-		} else {
-			item {
-				Button(onClick = onBack) {
-					Text("Вернуться назад")
-				}
 			}
 		}
 	}

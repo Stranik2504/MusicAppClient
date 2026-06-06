@@ -9,11 +9,16 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import dev.stranik.musicapp.domain.Creator
 import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Artist
+import dev.stranik.musicapp.domain.model.Playlist
 import dev.stranik.musicapp.domain.model.Track
+import dev.stranik.musicapp.domain.usecase.AddTrackToPlaylistUseCase
 import dev.stranik.musicapp.domain.usecase.GetFeaturedAlbumsUseCase
 import dev.stranik.musicapp.domain.usecase.GetRecentlyPlayedUseCase
 import dev.stranik.musicapp.domain.usecase.GetPopularArtistsUseCase
 import dev.stranik.musicapp.domain.usecase.GetRecommendationTracksUseCase
+import dev.stranik.musicapp.domain.usecase.GetUserPlaylistsUseCase
+import dev.stranik.musicapp.domain.usecase.LikeTrackUseCase
+import dev.stranik.musicapp.domain.usecase.UnlikeTrackUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +29,7 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val isLoading: Boolean = false,
+    val playlists: List<Playlist> = emptyList(),
     val featuredAlbums: List<Album> = emptyList(),
     val recentlyPlayed: List<Track> = emptyList(),
     val popularArtists: List<Artist> = emptyList(),
@@ -35,7 +41,11 @@ class HomeViewModel(
     private val getFeaturedAlbumsUseCase: GetFeaturedAlbumsUseCase,
     private val getRecentlyPlayedUseCase: GetRecentlyPlayedUseCase,
     private val getPopularArtistsUseCase: GetPopularArtistsUseCase,
-    private val getRecommendationTracksUseCase: GetRecommendationTracksUseCase
+    private val getRecommendationTracksUseCase: GetRecommendationTracksUseCase,
+    private val getUserPlaylistsUseCase: GetUserPlaylistsUseCase,
+    private val unlikeTrackUseCase: UnlikeTrackUseCase,
+    private val likeTrackUseCase: LikeTrackUseCase,
+    private val addTrackToPlaylistUseCase: AddTrackToPlaylistUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -48,6 +58,7 @@ class HomeViewModel(
     fun loadHomeContent() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
+
             try {
                 coroutineScope {
                     val featuredAlbumsDeferred = async { getFeaturedAlbumsUseCase() }
@@ -86,6 +97,41 @@ class HomeViewModel(
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
             }
+
+            getUserPlaylistsUseCase()
+            .onSuccess { playlists ->
+                _uiState.update {
+                    it.copy(
+                        playlists = playlists,
+                    )
+                }
+            };
+        }
+    }
+
+    fun toggleLike(track: Track) {
+        viewModelScope.launch {
+            val result = if (track.isLiked) {
+                unlikeTrackUseCase(track.id.toLong())
+            } else {
+                likeTrackUseCase(track.id.toLong())
+            }
+
+            if (result.isSuccess) {
+                loadHomeContent()
+            }
+        }
+    }
+
+    fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+        viewModelScope.launch {
+            val result = addTrackToPlaylistUseCase(playlist.id, track.id)
+
+            if (result.isSuccess) {
+                loadHomeContent()
+            } else {
+                _uiState.update { it.copy(error = result.exceptionOrNull()?.message) }
+            }
         }
     }
 
@@ -97,17 +143,27 @@ class HomeViewModel(
         fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val recommendationRepository = Creator.provideRecommendationRepository()
+                val trackRepository = Creator.provideTrackRepository()
+                val libraryRepository = Creator.provideLibraryRepository()
 
                 val getFeaturedAlbums = Creator.provideGetFeaturedAlbums(recommendationRepository)
                 val getRecentlyPlayed = Creator.provideGetRecentlyPlayed(recommendationRepository)
                 val getPopularArtists = Creator.provideGetPopularArtists(recommendationRepository)
                 val getNewReleases = Creator.provideGetNewReleases(recommendationRepository)
+                val getUserPlaylistsUseCase = Creator.provideGetUserPlaylists(libraryRepository)
+                val unlikeTrackUseCase = Creator.provideUnlikeTrack(trackRepository)
+                val likeTrackUseCase = Creator.provideLikeTrack(trackRepository)
+                val addTrackToPlaylistUseCase = Creator.provideAddTrackToPlaylist(libraryRepository)
 
                 HomeViewModel(
                     getFeaturedAlbumsUseCase = getFeaturedAlbums,
                     getRecentlyPlayedUseCase = getRecentlyPlayed,
                     getPopularArtistsUseCase = getPopularArtists,
                     getRecommendationTracksUseCase = getNewReleases,
+                    getUserPlaylistsUseCase = getUserPlaylistsUseCase,
+                    unlikeTrackUseCase = unlikeTrackUseCase,
+                    likeTrackUseCase = likeTrackUseCase,
+                    addTrackToPlaylistUseCase = addTrackToPlaylistUseCase
                 )
             }
         }

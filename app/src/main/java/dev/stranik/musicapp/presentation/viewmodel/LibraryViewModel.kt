@@ -69,8 +69,8 @@ class LibraryViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                playlists = playlistsResult.getOrThrow().map(libraryUiMapper::toPlaylist),
-                                likedTracks = likedTracksResult.getOrThrow().map(libraryUiMapper::toTrack)
+                                playlists = playlistsResult.getOrThrow(),
+                                likedTracks = likedTracksResult.getOrThrow()
                             )
                         }
                     } else {

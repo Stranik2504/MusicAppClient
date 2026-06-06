@@ -13,7 +13,6 @@ import dev.stranik.musicapp.presentation.mapper.toDomain
 import io.ktor.http.HttpStatusCode
 
 class LibraryRepositoryImpl : LibraryRepository {
-
     override suspend fun getLikedTracks(): Result<List<Track>> = runCatching {
         val likedIdsRes = UserApiService.getLikedTrackIds()
 
