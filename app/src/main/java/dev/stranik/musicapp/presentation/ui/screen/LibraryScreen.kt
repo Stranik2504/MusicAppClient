@@ -1,5 +1,6 @@
 package dev.stranik.musicapp.presentation.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,7 +79,7 @@ fun LibraryScreen(
         )
 
         TabRow(selectedTabIndex = selectedTab.ordinal) {
-            LibraryTab.values().forEach { tab ->
+            LibraryTab.entries.forEach { tab ->
                 Tab(
                     selected = selectedTab == tab,
                     onClick = { selectedTab = tab },
@@ -105,7 +106,10 @@ fun LibraryScreen(
 
                 LibraryTab.LIKED -> LikedTracksTab(
                     tracks = state.likedTracks,
-                    onTrackClick = onTrackClick
+                    playlists = state.playlists,
+                    onTrackClick = onTrackClick,
+                    onToggleLike = { viewModel.toggleLike(it) },
+                    onAddToPlaylist = { track, playlist -> viewModel.addTrackToPlaylist(track, playlist) }
                 )
             }
         }
@@ -203,7 +207,10 @@ private fun PlaylistItem(playlist: Playlist, onClick: () -> Unit) {
 @Composable
 private fun LikedTracksTab(
     tracks: List<Track>,
-    onTrackClick: (Track) -> Unit
+    playlists: List<Playlist>,
+    onTrackClick: (Track) -> Unit,
+    onToggleLike: (Track) -> Unit,
+    onAddToPlaylist: (Track, Playlist) -> Unit
 ) {
     if (tracks.isEmpty()) {
         EmptyState(
@@ -212,19 +219,19 @@ private fun LikedTracksTab(
         )
         return
     }
+
     LazyColumn(
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        item {
-            Text(
-                text = "${tracks.size} треков",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
         items(tracks, key = { it.id }) { track ->
-            TrackItem(track = track, onClick = { onTrackClick(track) })
+            TrackItem(
+                track = track,
+                onClick = { onTrackClick(track) },
+                onToggleLike = { onToggleLike(track) },
+                playlists = playlists,
+                onAddToPlaylist = { playlist -> onAddToPlaylist(track, playlist) }
+            )
         }
     }
 }

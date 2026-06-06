@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,6 +48,7 @@ fun HomeScreen(
             )
 
             else -> HomeContent(
+                viewModel = viewModel,
                 state = state,
                 onTrackClick = onTrackClick,
                 onArtistClick = onArtistClick,
@@ -61,6 +60,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
+    viewModel: HomeViewModel,
     state: HomeUiState,
     onTrackClick: (Track) -> Unit,
     onArtistClick: (String) -> Unit,
@@ -106,7 +106,10 @@ private fun HomeContent(
                 TrackItem(
                     track = track,
                     onClick = { onTrackClick(track) },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    playlists = state.playlists,
+                    onToggleLike = { viewModel.toggleLike(track) },
+                    onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
                 )
             }
         }
@@ -129,24 +132,18 @@ private fun HomeContent(
             }
         }
 
-        // Новинки
-        if (state.newReleases.isNotEmpty()) {
-            item {
-                SectionTitle(title = "Новые релизы")
-                LazyHorizontalGrid(
-                    rows = GridCells.Fixed(2),
-                    modifier = Modifier.height(280.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    this@LazyColumn.items(state.newReleases, key = { it.id }) { album ->
-                        AlbumCard(
-                            album = album,
-                            onClick = { onAlbumClick(album.id) }
-                        )
-                    }
-                }
+        // Рекомендуемые треки
+        if (state.recommendationTracks.isNotEmpty()) {
+            item { SectionTitle(title = "Рекомендуемые треки") }
+            items(state.recommendationTracks.take(20), key = { it.id }) { track ->
+                TrackItem(
+                    track = track,
+                    onClick = { onTrackClick(track) },
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    playlists = state.playlists,
+                    onToggleLike = { viewModel.toggleLike(track) },
+                    onAddToPlaylist = { playlist -> viewModel.addTrackToPlaylist(track, playlist) }
+                )
             }
         }
     }

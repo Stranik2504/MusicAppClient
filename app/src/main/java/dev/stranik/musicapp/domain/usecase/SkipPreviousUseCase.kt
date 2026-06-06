@@ -1,8 +1,11 @@
 package dev.stranik.musicapp.domain.usecase
 
-class SkipPreviousUseCase {
-    operator fun invoke() {
-        // Заглушка
+import dev.stranik.musicapp.domain.repository.PlayerRepository
+
+class SkipPreviousUseCase(
+    private val playerRepository: PlayerRepository
+) {
+    suspend operator fun invoke() {
+        playerRepository.skipPrevious()
     }
 }
-

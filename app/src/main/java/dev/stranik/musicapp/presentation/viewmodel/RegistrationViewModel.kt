@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import androidx.core.content.edit
+import dev.stranik.musicapp.domain.Creator
+import dev.stranik.musicapp.domain.model.UserRegistration
+import dev.stranik.musicapp.domain.usecase.RegistrationUseCase
 
 data class RegistrationUiState(
 	val username: String = "",
@@ -22,10 +24,9 @@ data class RegistrationUiState(
 	val success: Boolean = false
 )
 
-class RegistrationViewModel(context: Context) : ViewModel() {
-
-	private val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-
+class RegistrationViewModel(
+	private val registration: RegistrationUseCase
+) : ViewModel() {
 	private val _uiState = MutableStateFlow(RegistrationUiState())
 	val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
 
@@ -50,7 +51,7 @@ class RegistrationViewModel(context: Context) : ViewModel() {
 			_uiState.value = _uiState.value.copy(isLoading = true, error = null, success = false)
 
 			val state = _uiState.value
-			// Простая валидация
+
 			if (state.email.isBlank() || state.password.isBlank() || state.confirmPassword.isBlank()) {
 				_uiState.value = state.copy(isLoading = false, error = "Заполните все поля")
 				return@launch
@@ -61,13 +62,18 @@ class RegistrationViewModel(context: Context) : ViewModel() {
 				return@launch
 			}
 
-			// Сохранение простым способом в SharedPreferences
-			prefs.edit {
-                putString("username", state.username)
-                    .putString("email", state.email)
-                    .putString("password", state.password)
-                    .putBoolean("is_logged", true)
-            }
+			val result = registration(
+				UserRegistration(
+					username = state.username,
+					email = state.email,
+					password = state.password
+				)
+			)
+
+			if (result.isFailure) {
+				_uiState.value = state.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Ошибка регистрации")
+				return@launch
+			}
 
 			_uiState.value = state.copy(isLoading = false, success = true)
 		}
@@ -75,7 +81,13 @@ class RegistrationViewModel(context: Context) : ViewModel() {
 
 	companion object {
 		fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-			initializer { RegistrationViewModel(context) }
+			initializer {
+				val tokenManager = Creator.provideTokenManager(context)
+				val authRepository = Creator.provideAuthRepository(tokenManager)
+				val registration = Creator.provideRegistrationUseCase(authRepository)
+
+				RegistrationViewModel(registration)
+			}
 		}
 	}
 }

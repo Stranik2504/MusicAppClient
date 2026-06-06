@@ -11,11 +11,15 @@ import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.domain.usecase.ObservePlayerStateUseCase
 import dev.stranik.musicapp.domain.usecase.PlayTrackUseCase
 import dev.stranik.musicapp.domain.usecase.SeekUseCase
-import dev.stranik.musicapp.presentation.mapper.PlayerUiMapper
 import dev.stranik.musicapp.domain.usecase.PauseTrackUseCase
 import dev.stranik.musicapp.domain.usecase.SkipNextUseCase
 import dev.stranik.musicapp.domain.usecase.SkipPreviousUseCase
 import dev.stranik.musicapp.domain.usecase.LikeTrackUseCase
+import dev.stranik.musicapp.domain.usecase.UnlikeTrackUseCase
+import dev.stranik.musicapp.domain.usecase.SetRepeatModeUseCase
+import dev.stranik.musicapp.domain.usecase.SetShuffleUseCase
+import dev.stranik.musicapp.domain.usecase.UpdatePlayerLikeStatusUseCase
+import dev.stranik.musicapp.presentation.mapper.toUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,8 +63,11 @@ class PlayerViewModel(
     private val skipPreviousUseCase: SkipPreviousUseCase,
     private val seekUseCase: SeekUseCase,
     private val likeTrackUseCase: LikeTrackUseCase,
+    private val unlikeTrackUseCase: UnlikeTrackUseCase,
+    private val setRepeatModeUseCase: SetRepeatModeUseCase,
+    private val setShuffleUseCase: SetShuffleUseCase,
+    private val updatePlayerLikeStatusUseCase: UpdatePlayerLikeStatusUseCase,
     private val playerStateUseCase: ObservePlayerStateUseCase,
-    private val playerUiMapper: PlayerUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlayerUiState())
@@ -73,19 +80,27 @@ class PlayerViewModel(
     private fun observePlayerState() {
         viewModelScope.launch {
             playerStateUseCase().collect { playerState ->
-                _uiState.value = playerUiMapper.toUiState(playerState)
+                _uiState.value = playerState.toUiState()
             }
         }
     }
 
-    fun play(track: Track) {
-        viewModelScope.launch { playTrackUseCase(trackId = track.id) }
+    fun play(trackId: String) {
+        viewModelScope.launch {
+            playTrackUseCase(trackId = trackId)
+        }
     }
 
     fun onPlayPause() {
         viewModelScope.launch {
-            if (_uiState.value.isPlaying) pauseTrackUseCase()
-            else playTrackUseCase(trackId = _uiState.value.currentTrack?.id ?: return@launch)
+            if (_uiState.value.isPlaying) {
+                pauseTrackUseCase()
+            } else {
+                val trackId = _uiState.value.currentTrack?.id
+                if (trackId != null) {
+                    playTrackUseCase.resume()
+                }
+            }
         }
     }
 
@@ -94,43 +109,66 @@ class PlayerViewModel(
 
     fun onSeek(fraction: Float) {
         val durationMs = _uiState.value.durationMs
-        viewModelScope.launch { seekUseCase(positionMs = (durationMs * fraction).toLong()) }
+
+        viewModelScope.launch {
+            seekUseCase(positionMs = (durationMs * fraction).toLong())
+        }
     }
 
     fun onLikeToggle() {
-        val trackId = _uiState.value.currentTrack?.id ?: return
+        val track = _uiState.value.currentTrack ?: return
+        val trackId = track.id.toLongOrNull() ?: return
+        val isCurrentlyLiked = _uiState.value.isLiked
+
         viewModelScope.launch {
-            likeTrackUseCase(trackId = trackId)
-            _uiState.update { it.copy(isLiked = !it.isLiked) }
+            val result = if (isCurrentlyLiked) {
+                unlikeTrackUseCase(trackId)
+            } else {
+                likeTrackUseCase(trackId)
+            }
+            
+            if (result.isSuccess) {
+                // Синхронизируем состояние лайка с репозиторием плеера
+                updatePlayerLikeStatusUseCase(!isCurrentlyLiked)
+            }
         }
     }
 
     fun onShuffleToggle() {
-        _uiState.update { it.copy(isShuffleEnabled = !it.isShuffleEnabled) }
+        val newValue = !_uiState.value.isShuffleEnabled
+        viewModelScope.launch {
+            setShuffleUseCase(newValue)
+        }
     }
 
     fun onRepeatToggle() {
-        _uiState.update {
-            it.copy(
-                repeatMode = when (it.repeatMode) {
-                    RepeatMode.OFF -> RepeatMode.ALL
-                    RepeatMode.ALL -> RepeatMode.ONE
-                    RepeatMode.ONE -> RepeatMode.OFF
-                }
-            )
+        val nextMode = when (_uiState.value.repeatMode) {
+            RepeatMode.OFF -> RepeatMode.ALL
+            RepeatMode.ALL -> RepeatMode.ONE
+            RepeatMode.ONE -> RepeatMode.OFF
+        }
+        viewModelScope.launch {
+            setRepeatModeUseCase(nextMode)
         }
     }
 
     companion object {
         fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val playTrack = Creator.providePlayTrack()
-                val pauseTrack = Creator.providePauseTrack()
-                val skipNext = Creator.provideSkipNext()
-                val skipPrevious = Creator.provideSkipPrevious()
-                val seek = Creator.provideSeek()
-                val likeTrack = Creator.provideLikeTrack()
-                val observePlayerState = Creator.provideObservePlayerState()
+                val playerRepo = Creator.providePlayerRepository(context)
+                val trackRepo = Creator.provideTrackRepository()
+                
+                val playTrack = Creator.providePlayTrack(playerRepo, trackRepo)
+                val pauseTrack = Creator.providePauseTrack(playerRepo)
+                val skipNext = Creator.provideSkipNext(playerRepo)
+                val skipPrevious = Creator.provideSkipPrevious(playerRepo)
+                val seek = Creator.provideSeek(playerRepo)
+                val likeTrack = Creator.provideLikeTrack(trackRepo)
+                val unlikeTrack = Creator.provideUnlikeTrack(trackRepo)
+                val setRepeatMode = Creator.provideSetRepeatMode(playerRepo)
+                val setShuffle = Creator.provideSetShuffle(playerRepo)
+                val updateLikeStatus = Creator.provideUpdatePlayerLikeStatus(playerRepo)
+                val observePlayerState = Creator.provideObservePlayerState(playerRepo)
 
                 PlayerViewModel(
                     playTrackUseCase = playTrack,
@@ -139,8 +177,11 @@ class PlayerViewModel(
                     skipPreviousUseCase = skipPrevious,
                     seekUseCase = seek,
                     likeTrackUseCase = likeTrack,
+                    unlikeTrackUseCase = unlikeTrack,
+                    setRepeatModeUseCase = setRepeatMode,
+                    setShuffleUseCase = setShuffle,
+                    updatePlayerLikeStatusUseCase = updateLikeStatus,
                     playerStateUseCase = observePlayerState,
-                    playerUiMapper = PlayerUiMapper(),
                 )
             }
         }

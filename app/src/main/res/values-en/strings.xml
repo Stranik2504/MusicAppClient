@@ -6,4 +6,5 @@
     <string name="next">Возпроизвести</string>
     <string name="liked_track">Любимый трек</string>
     <string name="options">Опции</string>
+    <string name="previous">Previous</string>
 </resources>

@@ -1,8 +1,11 @@
 package dev.stranik.musicapp.domain.usecase
 
-class LikeTrackUseCase {
-    operator fun invoke(trackId: String) {
-        // Заглушка: в реале поменяет статус лайка
+import dev.stranik.musicapp.domain.repository.TrackRepository
+
+class LikeTrackUseCase(
+    private val trackRepository: TrackRepository
+) {
+    suspend operator fun invoke(trackId: Long): Result<Unit> {
+        return trackRepository.likeTrack(trackId)
     }
 }
-

@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -24,18 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import dev.stranik.musicapp.presentation.viewmodel.PlayerUiState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipNext
 import dev.stranik.musicapp.R
 import dev.stranik.musicapp.presentation.common.UiText
+import dev.stranik.musicapp.presentation.viewmodel.PlayerUiState
 
 @Composable
 fun MiniPlayer(
     state: PlayerUiState,
     onPlayPause: () -> Unit,
+    onSkipNext: () -> Unit,
+    onSkipPrevious: () -> Unit,
     onClick: () -> Unit
 ) {
     val track = state.currentTrack ?: return
@@ -90,6 +93,14 @@ fun MiniPlayer(
                     )
                 }
 
+                // Skip Previous
+                IconButton(onClick = onSkipPrevious) {
+                    Icon(
+                        imageVector = Icons.Default.SkipPrevious,
+                        contentDescription = UiText.StringResource(R.string.previous).asString()
+                    )
+                }
+
                 // Play / Pause
                 IconButton(onClick = onPlayPause) {
                     Icon(
@@ -103,9 +114,9 @@ fun MiniPlayer(
                 }
 
                 // Skip Next
-                IconButton(onClick = { /* TODO: skip next — из PlayerViewModel */ }) {
+                IconButton(onClick = onSkipNext) {
                     Icon(
-                        Icons.Default.SkipNext,
+                        imageVector = Icons.Default.SkipNext,
                         contentDescription = UiText.StringResource(R.string.next).asString()
                     )
                 }

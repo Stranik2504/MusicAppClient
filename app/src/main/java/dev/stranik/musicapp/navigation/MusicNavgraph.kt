@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,18 +28,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import dev.stranik.musicapp.domain.Creator
 import dev.stranik.musicapp.presentation.ui.screen.AccountScreen
+import dev.stranik.musicapp.presentation.ui.screen.ArtistDetailScreen
 import dev.stranik.musicapp.presentation.ui.screen.LoginScreen
 import dev.stranik.musicapp.presentation.ui.screen.HomeScreen
 import dev.stranik.musicapp.presentation.ui.screen.LibraryScreen
 import dev.stranik.musicapp.presentation.ui.screen.PlayerScreen
+import dev.stranik.musicapp.presentation.ui.screen.PlaylistDetailScreen
 import dev.stranik.musicapp.presentation.ui.screen.RegistrationScreen
 import dev.stranik.musicapp.presentation.ui.screen.SearchScreen
 import dev.stranik.musicapp.presentation.viewmodel.AccountViewModel
+import dev.stranik.musicapp.presentation.viewmodel.ArtistDetailViewModel
 import dev.stranik.musicapp.presentation.viewmodel.HomeViewModel
 import dev.stranik.musicapp.presentation.viewmodel.LibraryViewModel
 import dev.stranik.musicapp.presentation.viewmodel.LoginViewModel
 import dev.stranik.musicapp.presentation.viewmodel.PlayerViewModel
+import dev.stranik.musicapp.presentation.viewmodel.PlaylistDetailViewModel
 import dev.stranik.musicapp.presentation.viewmodel.RegistrationViewModel
 import dev.stranik.musicapp.presentation.viewmodel.SearchViewModel
 
@@ -57,8 +63,8 @@ sealed class Screen(val route: String) {
     }
 
     object PlaylistDetail {
-        const val ROUTE = "playlist/{playlistId}"
-        fun createRoute(playlistId: String) = "playlist/$playlistId"
+        const val ROUTE = "playlist/{playlistId}/{isPlaylist}"
+        fun createRoute(playlistId: String, isPlaylist: Boolean = true) = "playlist/$playlistId/$isPlaylist"
     }
 }
 
@@ -81,30 +87,32 @@ private val authRoutes = setOf(Screen.Login.route, Screen.Registration.route)
 fun MusicNavGraph(
     context: Context, navController: NavHostController
 ) {
-    val loginViewModel = viewModel<LoginViewModel>(factory = LoginViewModel.getViewModelFactory(context))
-    val registrationViewModel = viewModel<RegistrationViewModel>(factory = RegistrationViewModel.getViewModelFactory(context))
-    val accountViewModel = viewModel<AccountViewModel>(factory = AccountViewModel.getViewModelFactory(context))
-    val homeViewModel = viewModel<HomeViewModel>(factory = HomeViewModel.getViewModelFactory(context))
-    val libraryViewModel = viewModel<LibraryViewModel>(factory = LibraryViewModel.getViewModelFactory(context))
-    val playerViewModel = viewModel<PlayerViewModel>(factory = PlayerViewModel.getViewModelFactory(context))
-    val searchViewModel = viewModel<SearchViewModel>(factory = SearchViewModel.getViewModelFactory(context))
+    val isLoggedIn by produceState<Boolean?>(initialValue = null) {
+        val tokenManager = Creator.provideTokenManager(context)
+        value = tokenManager.getAccessToken() != null
+    }
 
+    if (isLoggedIn == null) return
+
+    val playerViewModel = viewModel<PlayerViewModel>(factory = PlayerViewModel.getViewModelFactory(context))
     val playerState by playerViewModel.uiState.collectAsState()
+
     val currentRoute by navController.currentBackStackEntryAsState()
     val route = currentRoute?.destination?.route
     val showBottomBar = route !in authRoutes
+
+    val startDestination = if (isLoggedIn == true) Screen.Home.route else Screen.Login.route
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
                 Column {
-                    // Мини-плеер над bottom bar
-                    if (playerState.currentTrack != null &&
-                        route != Screen.Player.route
-                    ) {
+                    if (playerState.currentTrack != null && route != Screen.Player.route) {
                         MiniPlayer(
                             state = playerState,
                             onPlayPause = playerViewModel::onPlayPause,
+                            onSkipNext = playerViewModel::onSkipNext,
+                            onSkipPrevious = playerViewModel::onSkipPrevious,
                             onClick = { navController.navigate(Screen.Player.route) }
                         )
                     }
@@ -115,10 +123,11 @@ fun MusicNavGraph(
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(padding)
         ) {
             composable(Screen.Login.route) {
+                val loginViewModel = viewModel<LoginViewModel>(factory = LoginViewModel.getViewModelFactory(context))
                 LoginScreen(
                     viewModel = loginViewModel,
                     onLoginSuccess = {
@@ -133,6 +142,7 @@ fun MusicNavGraph(
                 )
             }
             composable(Screen.Registration.route) {
+                val registrationViewModel = viewModel<RegistrationViewModel>(factory = RegistrationViewModel.getViewModelFactory(context))
                 RegistrationScreen(
                     viewModel = registrationViewModel,
                     onRegistrationSuccess = {
@@ -144,12 +154,13 @@ fun MusicNavGraph(
                 )
             }
             composable(Screen.Account.route) {
+                val accountViewModel = viewModel<AccountViewModel>(factory = AccountViewModel.getViewModelFactory(context))
+                
                 AccountScreen(
                     viewModel = accountViewModel,
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                            launchSingleTop = true
+                            popUpTo(0) { inclusive = true }
                         }
                     },
                     onEdit = {
@@ -158,49 +169,28 @@ fun MusicNavGraph(
                 )
             }
             composable(Screen.Home.route) {
+                val homeViewModel = viewModel<HomeViewModel>(factory = HomeViewModel.getViewModelFactory(context))
                 HomeScreen(
                     viewModel = homeViewModel,
-                    onTrackClick = playerViewModel::play,
-                    onArtistClick = { id ->
-                        navController.navigate(
-                            Screen.ArtistDetail.createRoute(
-                                id
-                            )
-                        )
-                    },
-                    onAlbumClick = { id ->
-                        navController.navigate(
-                            Screen.PlaylistDetail.createRoute(
-                                id
-                            )
-                        )
-                    }
+                    onTrackClick = { track -> playerViewModel.play(track.id) },
+                    onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) },
+                    onAlbumClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id, false)) }
                 )
             }
             composable(Screen.Search.route) {
+                val searchViewModel = viewModel<SearchViewModel>(factory = SearchViewModel.getViewModelFactory(context))
                 SearchScreen(
                     viewModel = searchViewModel,
-                    onTrackClick = playerViewModel::play,
-                    onArtistClick = { id ->
-                        navController.navigate(
-                            Screen.ArtistDetail.createRoute(
-                                id
-                            )
-                        )
-                    }
+                    onTrackClick = { track -> playerViewModel.play(track.id) },
+                    onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) }
                 )
             }
             composable(Screen.Library.route) {
+                val libraryViewModel = viewModel<LibraryViewModel>(factory = LibraryViewModel.getViewModelFactory(context))
                 LibraryScreen(
                     viewModel = libraryViewModel,
-                    onPlaylistClick = { id ->
-                        navController.navigate(
-                            Screen.PlaylistDetail.createRoute(
-                                id
-                            )
-                        )
-                    },
-                    onTrackClick = playerViewModel::play
+                    onPlaylistClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id)) },
+                    onTrackClick = { track -> playerViewModel.play(track.id) }
                 )
             }
             composable(Screen.Player.route) {
@@ -213,15 +203,62 @@ fun MusicNavGraph(
                 route = Screen.ArtistDetail.ROUTE,
                 arguments = listOf(navArgument("artistId") { type = NavType.StringType })
             ) { backStackEntry ->
-                backStackEntry.arguments?.getString("artistId") ?: return@composable
-                // ArtistDetailScreen(artistId = ..., viewModel = hiltViewModel())
+                val artistId = backStackEntry.arguments?.getString("artistId") ?: return@composable
+                val artistDetailViewModel = viewModel<ArtistDetailViewModel>(
+                    key = artistId,
+                    factory = ArtistDetailViewModel.getViewModelFactory(artistId)
+                )
+
+                ArtistDetailScreen(
+                    viewModel = artistDetailViewModel,
+                    onBack = { navController.popBackStack() },
+                    onTrackClick = { track -> playerViewModel.play(track.id) }
+                )
             }
             composable(
                 route = Screen.PlaylistDetail.ROUTE,
-                arguments = listOf(navArgument("playlistId") { type = NavType.StringType })
+                arguments = listOf(
+                    navArgument("playlistId") { type = NavType.StringType },
+                    navArgument("isPlaylist") { type = NavType.BoolType }
+                )
             ) { backStackEntry ->
-                backStackEntry.arguments?.getString("playlistId") ?: return@composable
-                // PlaylistDetailScreen(playlistId = ..., viewModel = hiltViewModel())
+                val playlistId = backStackEntry.arguments?.getString("playlistId") ?: return@composable
+                val isPlaylist = backStackEntry.arguments?.getBoolean("isPlaylist") ?: return@composable
+
+                val libraryRepository = Creator.provideLibraryRepository()
+                val trackRepository = Creator.provideTrackRepository()
+                val albumRepository = Creator.provideAlbumRepository()
+                val playerRepository = Creator.providePlayerRepository(context)
+
+                val getPlaylistUseCase = Creator.provideGetPlaylistUseCase(libraryRepository)
+                val playPlaylistUseCase = Creator.providePlayPlaylistUseCase(playerRepository, trackRepository)
+                val getAlbumUseCase = Creator.provideGetAlbum(albumRepository)
+                val getTrackUseCase = Creator.provideGetTrack(trackRepository)
+                val getUserPlaylistsUseCase = Creator.provideGetUserPlaylists(libraryRepository)
+                val unlikeTrackUseCase = Creator.provideUnlikeTrack(trackRepository)
+                val likeTrackUseCase = Creator.provideLikeTrack(trackRepository)
+                val addTrackToPlaylistUseCase = Creator.provideAddTrackToPlaylist(libraryRepository)
+
+                val playlistDetailViewModel = viewModel<PlaylistDetailViewModel>(
+                    key = "$playlistId $isPlaylist",
+                    factory = PlaylistDetailViewModel.getViewModelFactory(
+                        playlistId = playlistId,
+                        isPlaylist = isPlaylist,
+                        getPlaylistUseCase = getPlaylistUseCase,
+                        playPlaylistUseCase = playPlaylistUseCase,
+                        getAlbumUseCase = getAlbumUseCase,
+                        getTrackUseCase = getTrackUseCase,
+                        getUserPlaylistsUseCase = getUserPlaylistsUseCase,
+                        unlikeTrackUseCase = unlikeTrackUseCase,
+                        likeTrackUseCase = likeTrackUseCase,
+                        addTrackToPlaylistUseCase = addTrackToPlaylistUseCase
+                    )
+                )
+
+                PlaylistDetailScreen(
+                    viewModel = playlistDetailViewModel,
+                    onBack = { navController.popBackStack() }
+                )
             }
         }
     }
