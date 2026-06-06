@@ -11,7 +11,6 @@ import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Artist
 import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.domain.usecase.SearchUseCase
-import dev.stranik.musicapp.presentation.mapper.LibraryUiMapper
 import dev.stranik.musicapp.presentation.mapper.SearchUiMapper
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,13 +22,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 sealed class SearchUiState {
-    object Idle    : SearchUiState()
+    object Idle : SearchUiState()
     object Loading : SearchUiState()
     data class Success(
-        val tracks:  List<Track>  = emptyList(),
+        val tracks: List<Track> = emptyList(),
         val artists: List<Artist> = emptyList(),
-        val albums:  List<Album>  = emptyList()
+        val albums: List<Album> = emptyList()
     ) : SearchUiState()
+
     data class Empty(val query: String) : SearchUiState()
     data class Error(val message: String) : SearchUiState()
 }
@@ -40,8 +40,8 @@ class SearchViewModel(
     private val searchUiMapper: SearchUiMapper
 ) : ViewModel() {
 
-    private val _query    = MutableStateFlow("")
-    private val _uiState  = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
+    private val _query = MutableStateFlow("")
+    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
     val query: StateFlow<String> = _query.asStateFlow()
 
@@ -70,11 +70,12 @@ class SearchViewModel(
 
     private suspend fun search(query: String) {
         _uiState.value = SearchUiState.Loading
+
         try {
             val result = searchUseCase(query)
-            val tracks  = result.tracks.map(searchUiMapper::toTrack)
+            val tracks = result.tracks.map(searchUiMapper::toTrack)
             val artists = result.artists.map(searchUiMapper::toArtist)
-            val albums  = result.albums.map(searchUiMapper::toAlbum)
+            val albums = result.albums.map(searchUiMapper::toAlbum)
 
             _uiState.value = if (tracks.isEmpty() && artists.isEmpty() && albums.isEmpty()) {
                 SearchUiState.Empty(query)

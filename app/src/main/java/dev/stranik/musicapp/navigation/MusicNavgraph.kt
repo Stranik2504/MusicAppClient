@@ -63,8 +63,8 @@ sealed class Screen(val route: String) {
     }
 
     object PlaylistDetail {
-        const val ROUTE = "playlist/{playlistId}"
-        fun createRoute(playlistId: String) = "playlist/$playlistId"
+        const val ROUTE = "playlist/{playlistId}/{isPlaylist}"
+        fun createRoute(playlistId: String, isPlaylist: Boolean = true) = "playlist/$playlistId/$isPlaylist"
     }
 }
 
@@ -174,7 +174,7 @@ fun MusicNavGraph(
                     viewModel = homeViewModel,
                     onTrackClick = { track -> playerViewModel.play(track.id) },
                     onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) },
-                    onAlbumClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id)) }
+                    onAlbumClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id, false)) }
                 )
             }
             composable(Screen.Search.route) {
@@ -217,22 +217,30 @@ fun MusicNavGraph(
             }
             composable(
                 route = Screen.PlaylistDetail.ROUTE,
-                arguments = listOf(navArgument("playlistId") { type = NavType.StringType })
+                arguments = listOf(
+                    navArgument("playlistId") { type = NavType.StringType },
+                    navArgument("isPlaylist") { type = NavType.BoolType }
+                )
             ) { backStackEntry ->
                 val playlistId = backStackEntry.arguments?.getString("playlistId") ?: return@composable
+                val isPlaylist = backStackEntry.arguments?.getBoolean("isPlaylist") ?: return@composable
 
                 val libraryRepository = Creator.provideLibraryRepository()
                 val trackRepository = Creator.provideTrackRepository()
+                val albumRepository = Creator.provideAlbumRepository()
                 val playerRepository = Creator.providePlayerRepository(context)
                 val playPlaylistUseCase = Creator.providePlayPlaylistUseCase(playerRepository, trackRepository)
+                val getAlbumUseCase = Creator.provideGetAlbum(albumRepository)
 
                 val playlistDetailViewModel = viewModel<PlaylistDetailViewModel>(
-                    key = playlistId,
+                    key = "$playlistId $isPlaylist",
                     factory = PlaylistDetailViewModel.getViewModelFactory(
                         playlistId = playlistId,
+                        isPlaylist = isPlaylist,
                         libraryRepository = libraryRepository,
                         trackRepository = trackRepository,
-                        playPlaylistUseCase = playPlaylistUseCase
+                        playPlaylistUseCase = playPlaylistUseCase,
+                        getAlbumUseCase
                     )
                 )
 

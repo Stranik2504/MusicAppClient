@@ -1,27 +1,42 @@
 package dev.stranik.musicapp.presentation.mapper
 
+import dev.stranik.musicapp.data.model.AlbumDto
+import dev.stranik.musicapp.data.model.ArtistDetailsDto
 import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Artist
-import dev.stranik.musicapp.domain.model.Track
+import dev.stranik.musicapp.domain.model.Playlist
 
-class HomeUiMapper {
-    
-    fun toAlbum(album: Album): Album {
-        // Для данного примера просто возвращаем данные как есть
-        // В реальном приложении здесь могла бы быть более сложная трансформация
-        return album
-    }
-    
-    fun toTrack(track: Track): Track {
-        // Для данного примера просто возвращаем данные как есть
-        // В реальном приложении здесь могла бы быть более сложная трансформация
-        return track
-    }
-    
-    fun toArtist(artist: Artist): Artist {
-        // Для данного примера просто возвращаем данные как есть
-        // В реальном приложении здесь могла бы быть более сложная трансформация
-        return artist
+fun AlbumDto.toDomain() = Album(
+    id = id.toString(),
+    title = title,
+    artistName = artist.name,
+    tracks = tracks.map { it.id },
+    coverUrl = coverUrl ?: "",
+    year = createdAt.year,
+    albumType = albumType ?: "Unknown"
+)
+
+fun Album.toPlaylist() = Playlist(
+    id = id,
+    title = title,
+    description = "Альбом $title",
+    coverUrl = coverUrl,
+    trackCount = tracks.size,
+    isPublic = false,
+    trackIds = tracks.map { it.toString() }
+)
+
+fun ArtistDetailsDto.toDomain() = Artist(
+    id = id.toString(),
+    name = name,
+    avatarUrl = avatarUrl,
+    monthlyListenersFormatted = formatMonthlyListeners(monthlyListeners)
+)
+
+fun formatMonthlyListeners(monthlyListeners: Int): String {
+    return when {
+        monthlyListeners >= 1_000_000 -> "${monthlyListeners / 1_000_000} М"
+        monthlyListeners >= 100_000 -> "${monthlyListeners / 100_000} тыс."
+        else -> monthlyListeners.toString()
     }
 }
-

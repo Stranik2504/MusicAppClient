@@ -1,5 +1,8 @@
 package dev.stranik.musicapp.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Track (
     val id: String,
     val title: String,

@@ -2,22 +2,27 @@ package dev.stranik.musicapp.domain
 
 import android.content.Context
 import dev.stranik.musicapp.data.local.TokenManager
+import dev.stranik.musicapp.data.repository.AlbumRepositoryImpl
 import dev.stranik.musicapp.data.repository.AuthRepositoryImpl
 import dev.stranik.musicapp.data.repository.LibraryRepositoryImpl
 import dev.stranik.musicapp.data.repository.PlayerRepositoryImpl
+import dev.stranik.musicapp.data.repository.RecommendationRepositoryImpl
 import dev.stranik.musicapp.data.repository.TrackRepositoryImpl
 import dev.stranik.musicapp.data.repository.UserRepositoryImpl
+import dev.stranik.musicapp.domain.repository.AlbumRepository
 import dev.stranik.musicapp.domain.repository.AuthRepository
 import dev.stranik.musicapp.domain.repository.LibraryRepository
 import dev.stranik.musicapp.domain.repository.PlayerRepository
+import dev.stranik.musicapp.domain.repository.RecommendationRepository
 import dev.stranik.musicapp.domain.repository.TrackRepository
 import dev.stranik.musicapp.domain.repository.UserRepository
 import dev.stranik.musicapp.domain.usecase.AddTrackToPlaylistUseCase
 import dev.stranik.musicapp.domain.usecase.CreatePlaylistUseCase
+import dev.stranik.musicapp.domain.usecase.GetAlbumUseCase
 import dev.stranik.musicapp.domain.usecase.GetFeaturedAlbumsUseCase
 import dev.stranik.musicapp.domain.usecase.GetLikedTracksUseCase
 import dev.stranik.musicapp.domain.usecase.GetMeUseCase
-import dev.stranik.musicapp.domain.usecase.GetNewReleasesUseCase
+import dev.stranik.musicapp.domain.usecase.GetRecommendationTracksUseCase
 import dev.stranik.musicapp.domain.usecase.GetPopularArtistsUseCase
 import dev.stranik.musicapp.domain.usecase.GetRecentlyPlayedUseCase
 import dev.stranik.musicapp.domain.usecase.GetUserPlaylistsUseCase
@@ -49,6 +54,8 @@ object Creator {
     fun provideUserRepository(): UserRepository = UserRepositoryImpl()
     fun provideLibraryRepository(): LibraryRepository = LibraryRepositoryImpl()
     fun provideTrackRepository(): TrackRepository = TrackRepositoryImpl()
+    fun provideRecommendationRepository(): RecommendationRepository = RecommendationRepositoryImpl()
+    fun provideAlbumRepository(): AlbumRepository = AlbumRepositoryImpl()
     
     fun providePlayerRepository(context: Context): PlayerRepository {
         return playerRepository ?: PlayerRepositoryImpl(context).also {
@@ -63,11 +70,11 @@ object Creator {
     fun provideGetMe(userRepository: UserRepository): GetMeUseCase = GetMeUseCase(userRepository)
 
     fun provideCreatePlaylist(libraryRepository: LibraryRepository): CreatePlaylistUseCase = CreatePlaylistUseCase(libraryRepository)
-    fun provideGetFeaturedAlbums(): GetFeaturedAlbumsUseCase = GetFeaturedAlbumsUseCase()
     fun provideGetLikedTracks(libraryRepository: LibraryRepository): GetLikedTracksUseCase = GetLikedTracksUseCase(libraryRepository)
-    fun provideGetNewReleases(): GetNewReleasesUseCase = GetNewReleasesUseCase()
-    fun provideGetPopularArtists(): GetPopularArtistsUseCase = GetPopularArtistsUseCase()
-    fun provideGetRecentlyPlayed(): GetRecentlyPlayedUseCase = GetRecentlyPlayedUseCase()
+    fun provideGetFeaturedAlbums(recommendationRepository: RecommendationRepository): GetFeaturedAlbumsUseCase = GetFeaturedAlbumsUseCase(recommendationRepository)
+    fun provideGetNewReleases(recommendationRepository: RecommendationRepository): GetRecommendationTracksUseCase = GetRecommendationTracksUseCase(recommendationRepository)
+    fun provideGetPopularArtists(recommendationRepository: RecommendationRepository): GetPopularArtistsUseCase = GetPopularArtistsUseCase(recommendationRepository)
+    fun provideGetRecentlyPlayed(recommendationRepository: RecommendationRepository): GetRecentlyPlayedUseCase = GetRecentlyPlayedUseCase(recommendationRepository)
     fun provideGetUserPlaylists(libraryRepository: LibraryRepository): GetUserPlaylistsUseCase = GetUserPlaylistsUseCase(libraryRepository)
     
     fun provideLikeTrack(trackRepository: TrackRepository): LikeTrackUseCase = LikeTrackUseCase(trackRepository)
@@ -75,6 +82,8 @@ object Creator {
     
     fun provideAddTrackToPlaylist(libraryRepository: LibraryRepository): AddTrackToPlaylistUseCase = AddTrackToPlaylistUseCase(libraryRepository)
     fun provideRemoveTrackFromPlaylist(libraryRepository: LibraryRepository): RemoveTrackFromPlaylistUseCase = RemoveTrackFromPlaylistUseCase(libraryRepository)
+
+    fun provideGetAlbum(albumRepository: AlbumRepository): GetAlbumUseCase = GetAlbumUseCase(albumRepository)
 
     fun provideObservePlayerState(playerRepository: PlayerRepository): ObservePlayerStateUseCase = ObservePlayerStateUseCase(playerRepository)
     fun providePauseTrack(playerRepository: PlayerRepository): PauseTrackUseCase = PauseTrackUseCase(playerRepository)

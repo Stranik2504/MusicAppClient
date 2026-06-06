@@ -2,13 +2,10 @@ package dev.stranik.musicapp.domain.usecase
 
 import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Artist
+import dev.stranik.musicapp.domain.model.SearchResult
 import dev.stranik.musicapp.domain.model.Track
 
-data class SearchResult(
-    val tracks: List<Track> = emptyList(),
-    val artists: List<Artist> = emptyList(),
-    val albums: List<Album> = emptyList()
-)
+
 
 class SearchUseCase {
     operator fun invoke(query: String): SearchResult {
@@ -27,9 +24,9 @@ class SearchUseCase {
         ).filter { it.name.lowercase().contains(lower) }
 
         val albums = listOf(
-            Album("s_al1", "Midnight Dreams", "Luna Echo", "https://via.placeholder.com/300?text=Midnight+Dreams", 2023, "Album"),
-            Album("s_al2", "Electric Nights", "Neon Pulse", "https://via.placeholder.com/300?text=Electric+Nights", 2023, "Album"),
-            Album("s_al3", "Urban Vibes", "City Sounds", "https://via.placeholder.com/300?text=Urban+Vibes", 2024, "Album")
+            Album("s_al1", "Midnight Dreams", "Luna Echo", listOf(1), "https://via.placeholder.com/300?text=Midnight+Dreams", 2023, "Album"),
+            Album("s_al2", "Electric Nights", "Neon Pulse", listOf(1), "https://via.placeholder.com/300?text=Electric+Nights", 2023, "Album"),
+            Album("s_al3", "Urban Vibes", "City Sounds", listOf(1), "https://via.placeholder.com/300?text=Urban+Vibes", 2024, "Album")
         ).filter { it.title.lowercase().contains(lower) || it.artistName.lowercase().contains(lower) }
 
         return SearchResult(tracks = tracks, artists = artists, albums = albums)

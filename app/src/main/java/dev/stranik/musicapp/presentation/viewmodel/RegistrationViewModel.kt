@@ -52,7 +52,6 @@ class RegistrationViewModel(
 
 			val state = _uiState.value
 
-			// Простая валидация
 			if (state.email.isBlank() || state.password.isBlank() || state.confirmPassword.isBlank()) {
 				_uiState.value = state.copy(isLoading = false, error = "Заполните все поля")
 				return@launch

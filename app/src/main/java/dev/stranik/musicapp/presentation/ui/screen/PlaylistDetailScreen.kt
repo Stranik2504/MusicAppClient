@@ -55,7 +55,7 @@ fun PlaylistDetailScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
                     }
                     Text(
-                        text = "Плейлист",
+                        text = if (state.isPlaylist) "Плейлист" else "Альбом",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 8.dp)
@@ -73,8 +73,14 @@ fun PlaylistDetailScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(Modifier.height(8.dp))
+
+                            var type = ""
+
+                            if (state.isPlaylist)
+                                type = " · " + if (playlist.isPublic) "публичный" else "приватный"
+
                             Text(
-                                text = "${playlist.trackCount} треков · ${if (playlist.isPublic) "публичный" else "приватный"}",
+                                text = "${playlist.trackCount} треков${type}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
