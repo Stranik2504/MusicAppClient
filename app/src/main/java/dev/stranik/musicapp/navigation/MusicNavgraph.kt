@@ -185,7 +185,8 @@ fun MusicNavGraph(
                 SearchScreen(
                     viewModel = searchViewModel,
                     onTrackClick = { track -> playerViewModel.play(track.id) },
-                    onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) }
+                    onArtistClick = { id -> navController.navigate(Screen.ArtistDetail.createRoute(id)) },
+                    onAlbumClick = { id -> navController.navigate(Screen.PlaylistDetail.createRoute(id, false)) }
                 )
             }
             composable(Screen.Library.route) {

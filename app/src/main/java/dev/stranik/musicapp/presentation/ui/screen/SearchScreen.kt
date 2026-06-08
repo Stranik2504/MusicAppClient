@@ -1,5 +1,6 @@
 package dev.stranik.musicapp.presentation.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,8 @@ import dev.stranik.musicapp.presentation.viewmodel.SearchViewModel
 fun SearchScreen(
     viewModel: SearchViewModel,
     onTrackClick: (Track) -> Unit,
-    onArtistClick: (String) -> Unit
+    onArtistClick: (String) -> Unit,
+    onAlbumClick: (String) -> Unit
 ) {
     val query by viewModel.query.collectAsState()
     val state by viewModel.uiState.collectAsState()
@@ -85,7 +87,8 @@ fun SearchScreen(
                 viewModel = viewModel,
                 state = s,
                 onTrackClick = onTrackClick,
-                onArtistClick = onArtistClick
+                onArtistClick = onArtistClick,
+                onAlbumClick = onAlbumClick
             )
 
             is SearchUiState.Empty -> SearchEmptyContent(query = s.query)
@@ -125,7 +128,8 @@ private fun SearchResultsContent(
     viewModel: SearchViewModel,
     state: SearchUiState.Success,
     onTrackClick: (Track) -> Unit,
-    onArtistClick: (String) -> Unit
+    onArtistClick: (String) -> Unit,
+    onAlbumClick: (String) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = 16.dp),
@@ -170,7 +174,11 @@ private fun SearchResultsContent(
         if (state.albums.isNotEmpty()) {
             item { SearchSectionTitle(stringResource(R.string.albums_section)) }
             items(state.albums, key = { "album_" + it.id }) { album ->
-                AlbumListItem(album = album, modifier = Modifier.padding(horizontal = 16.dp))
+                AlbumListItem(
+                    album = album,
+                    onClick = { onAlbumClick(album.id) },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
         }
     }
@@ -187,10 +195,15 @@ private fun SearchSectionTitle(title: String) {
 }
 
 @Composable
-private fun AlbumListItem(album: Album, modifier: Modifier = Modifier) {
+private fun AlbumListItem(
+    album: Album,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
