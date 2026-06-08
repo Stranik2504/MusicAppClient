@@ -1,6 +1,8 @@
 package dev.stranik.musicapp.domain
 
 import android.content.Context
+import androidx.room.Room
+import dev.stranik.musicapp.data.local.AppDatabase
 import dev.stranik.musicapp.data.local.TokenManager
 import dev.stranik.musicapp.data.repository.AlbumRepositoryImpl
 import dev.stranik.musicapp.data.repository.ArtistRepositoryImpl
@@ -54,17 +56,60 @@ import dev.stranik.musicapp.domain.usecase.UpdatePlayerLikeStatusUseCase
 
 object Creator {
     private var playerRepository: PlayerRepository? = null
+    private var database: AppDatabase? = null
+
+    private fun provideDatabase(context: Context): AppDatabase {
+        return database ?: synchronized(this) {
+            val instance = Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                "music_app_database"
+            ).build()
+            database = instance
+            instance
+        }
+    }
 
     fun provideTokenManager(context: Context): TokenManager = TokenManager(context)
 
     fun provideAuthRepository(tokenManager: TokenManager): AuthRepository = AuthRepositoryImpl(tokenManager)
-    fun provideUserRepository(): UserRepository = UserRepositoryImpl()
-    fun provideLibraryRepository(): LibraryRepository = LibraryRepositoryImpl()
-    fun provideTrackRepository(): TrackRepository = TrackRepositoryImpl()
-    fun provideRecommendationRepository(): RecommendationRepository = RecommendationRepositoryImpl()
-    fun provideAlbumRepository(): AlbumRepository = AlbumRepositoryImpl()
+    
+    fun provideUserRepository(context: Context): UserRepository {
+        val db = provideDatabase(context)
+        return UserRepositoryImpl(db.userDao())
+    }
+
+    fun provideLibraryRepository(context: Context): LibraryRepository {
+        val db = provideDatabase(context)
+        return LibraryRepositoryImpl(db.playlistDao(), db.trackDao(), db.cacheEntryDao())
+    }
+    
+    fun provideTrackRepository(context: Context): TrackRepository {
+        val db = provideDatabase(context)
+        return TrackRepositoryImpl(db.trackDao())
+    }
+
+    fun provideAlbumRepository(context: Context): AlbumRepository {
+        val db = provideDatabase(context)
+        return AlbumRepositoryImpl(db.albumDao())
+    }
+
+    fun provideArtistRepository(context: Context): ArtistRepository {
+        val db = provideDatabase(context)
+        return ArtistRepositoryImpl(db.artistDao())
+    }
+
+    fun provideRecommendationRepository(context: Context): RecommendationRepository {
+        val db = provideDatabase(context)
+        return RecommendationRepositoryImpl(
+            db.trackDao(),
+            db.albumDao(),
+            db.artistDao(),
+            db.cacheEntryDao()
+        )
+    }
+
     fun provideSearchRepository(): SearchRepository = SearchRepositoryImpl()
-    fun provideArtistRepository(): ArtistRepository = ArtistRepositoryImpl()
     
     fun providePlayerRepository(context: Context): PlayerRepository {
         return playerRepository ?: PlayerRepositoryImpl(context).also {

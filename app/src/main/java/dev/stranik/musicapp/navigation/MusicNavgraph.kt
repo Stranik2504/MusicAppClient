@@ -206,7 +206,7 @@ fun MusicNavGraph(
                 val artistId = backStackEntry.arguments?.getString("artistId") ?: return@composable
                 val artistDetailViewModel = viewModel<ArtistDetailViewModel>(
                     key = artistId,
-                    factory = ArtistDetailViewModel.getViewModelFactory(artistId)
+                    factory = ArtistDetailViewModel.getViewModelFactory(context, artistId)
                 )
 
                 ArtistDetailScreen(
@@ -225,9 +225,9 @@ fun MusicNavGraph(
                 val playlistId = backStackEntry.arguments?.getString("playlistId") ?: return@composable
                 val isPlaylist = backStackEntry.arguments?.getBoolean("isPlaylist") ?: return@composable
 
-                val libraryRepository = Creator.provideLibraryRepository()
-                val trackRepository = Creator.provideTrackRepository()
-                val albumRepository = Creator.provideAlbumRepository()
+                val libraryRepository = Creator.provideLibraryRepository(context)
+                val trackRepository = Creator.provideTrackRepository(context)
+                val albumRepository = Creator.provideAlbumRepository(context)
                 val playerRepository = Creator.providePlayerRepository(context)
 
                 val getPlaylistUseCase = Creator.provideGetPlaylistUseCase(libraryRepository)

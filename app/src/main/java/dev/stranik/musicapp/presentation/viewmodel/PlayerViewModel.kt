@@ -23,7 +23,6 @@ import dev.stranik.musicapp.presentation.mapper.toUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 enum class RepeatMode { OFF, ALL, ONE }
@@ -156,7 +155,7 @@ class PlayerViewModel(
         fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val playerRepo = Creator.providePlayerRepository(context)
-                val trackRepo = Creator.provideTrackRepository()
+                val trackRepo = Creator.provideTrackRepository(context)
                 
                 val playTrack = Creator.providePlayTrack(playerRepo, trackRepo)
                 val pauseTrack = Creator.providePauseTrack(playerRepo)

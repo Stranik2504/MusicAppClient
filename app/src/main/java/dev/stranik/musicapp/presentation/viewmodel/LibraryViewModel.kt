@@ -16,7 +16,6 @@ import dev.stranik.musicapp.domain.usecase.GetLikedTracksUseCase
 import dev.stranik.musicapp.domain.usecase.GetUserPlaylistsUseCase
 import dev.stranik.musicapp.domain.usecase.LikeTrackUseCase
 import dev.stranik.musicapp.domain.usecase.UnlikeTrackUseCase
-import dev.stranik.musicapp.presentation.mapper.LibraryUiMapper
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +42,6 @@ class LibraryViewModel(
     private val likeTrackUseCase: LikeTrackUseCase,
     private val unlikeTrackUseCase: UnlikeTrackUseCase,
     private val addTrackToPlaylistUseCase: AddTrackToPlaylistUseCase,
-    private val libraryUiMapper: LibraryUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LibraryUiState())
@@ -128,8 +126,8 @@ class LibraryViewModel(
     companion object {
         fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val libraryRepo = Creator.provideLibraryRepository()
-                val trackRepo = Creator.provideTrackRepository()
+                val libraryRepo = Creator.provideLibraryRepository(context)
+                val trackRepo = Creator.provideTrackRepository(context)
                 val getUserPlaylists = Creator.provideGetUserPlaylists(libraryRepo)
                 val getLikedTracks = Creator.provideGetLikedTracks(libraryRepo)
                 val createPlaylist = Creator.provideCreatePlaylist(libraryRepo)
@@ -144,7 +142,6 @@ class LibraryViewModel(
                     likeTrackUseCase = likeTrack,
                     unlikeTrackUseCase = unlikeTrack,
                     addTrackToPlaylistUseCase = addTrackToPlaylist,
-                    libraryUiMapper = LibraryUiMapper()
                 )
             }
         }

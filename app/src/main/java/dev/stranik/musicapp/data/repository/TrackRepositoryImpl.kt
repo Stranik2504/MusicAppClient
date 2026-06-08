@@ -1,5 +1,8 @@
 package dev.stranik.musicapp.data.repository
 
+import dev.stranik.musicapp.data.local.dao.TrackDao
+import dev.stranik.musicapp.data.local.entity.toDomain
+import dev.stranik.musicapp.data.local.entity.toEntity
 import dev.stranik.musicapp.data.remote.AlbumsApiService
 import dev.stranik.musicapp.data.remote.TrackApiService
 import dev.stranik.musicapp.data.remote.UserApiService
@@ -7,14 +10,23 @@ import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.domain.repository.TrackRepository
 import dev.stranik.musicapp.presentation.mapper.toDomain
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.runBlocking
 
-class TrackRepositoryImpl : TrackRepository {
+class TrackRepositoryImpl(
+    private val trackDao: TrackDao
+) : TrackRepository {
     override suspend fun getTrack(trackId: Long): Result<Track> = runCatching {
+        val cachedTrack = trackDao.getTrackById(trackId.toString())
+        
+        if (cachedTrack != null && !isCacheExpired(cachedTrack.cachedAt)) {
+            return@runCatching cachedTrack.toDomain()
+        }
+
         val res = TrackApiService.getTrack(trackId)
 
-        if (res.status != HttpStatusCode.OK)
-            throw Exception("Failed to get track: ${res.status}")
+        if (res.status != HttpStatusCode.OK) {
+            return@runCatching cachedTrack?.toDomain()
+                ?: throw Exception("Failed to get track and no cache available: ${res.status}")
+        }
 
         var coverUrl = ""
 
@@ -33,7 +45,11 @@ class TrackRepositoryImpl : TrackRepository {
         if (likes.status == HttpStatusCode.OK)
             isLiked = likes.value.contains(trackId)
 
-        res.value.toDomain(isLiked = isLiked, coverUrl = coverUrl)
+        val track = res.value.toDomain(isLiked = isLiked, coverUrl = coverUrl)
+        
+        trackDao.insertTrack(track.toEntity())
+        
+        track
     }
 
     override suspend fun likeTrack(trackId: Long): Result<Unit> = runCatching {
@@ -41,6 +57,10 @@ class TrackRepositoryImpl : TrackRepository {
 
         if (res.status != HttpStatusCode.OK && res.status != HttpStatusCode.Created)
             throw Exception("Failed to like track: ${res.status}")
+            
+        trackDao.getTrackById(trackId.toString())?.let {
+            trackDao.insertTrack(it.copy(isLiked = true))
+        }
     }
 
     override suspend fun unlikeTrack(trackId: Long): Result<Unit> = runCatching {
@@ -48,16 +68,21 @@ class TrackRepositoryImpl : TrackRepository {
 
         if (res.status != HttpStatusCode.OK && res.status != HttpStatusCode.NoContent)
             throw Exception("Failed to unlike track: ${res.status}")
+
+        trackDao.getTrackById(trackId.toString())?.let {
+            trackDao.insertTrack(it.copy(isLiked = false))
+        }
     }
 
     override fun getHlsManifestUrl(trackId: Long): String {
         return TrackApiService.getHlsManifestUrl(trackId)
     }
 
-    private fun formatDuration(seconds: Int): String {
-        val minutes = seconds / 60
-        val remainingSeconds = seconds % 60
+    private fun isCacheExpired(cachedAt: Long): Boolean {
+        return System.currentTimeMillis() - cachedAt > CACHE_EXPIRATION_TIME
+    }
 
-        return "%d:%02d".format(minutes, remainingSeconds)
+    companion object {
+        private const val CACHE_EXPIRATION_TIME = 24 * 60 * 60 * 1000L // 24 hours
     }
 }

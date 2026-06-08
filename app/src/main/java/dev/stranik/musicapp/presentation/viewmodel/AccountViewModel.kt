@@ -69,7 +69,7 @@ class AccountViewModel(
 			initializer {
 				val tokenManager = Creator.provideTokenManager(context)
 				val authRepository = Creator.provideAuthRepository(tokenManager)
-				val userRepository = Creator.provideUserRepository()
+				val userRepository = Creator.provideUserRepository(context)
 				val logout = Creator.provideLogoutUseCase(authRepository)
 				val isLoggedIn = Creator.provideIsLoggedInUseCase(authRepository)
 				val getMe = Creator.provideGetMe(userRepository)

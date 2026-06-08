@@ -16,7 +16,6 @@ import dev.stranik.musicapp.domain.usecase.GetTrackUseCase
 import dev.stranik.musicapp.domain.usecase.GetUserPlaylistsUseCase
 import dev.stranik.musicapp.domain.usecase.LikeTrackUseCase
 import dev.stranik.musicapp.domain.usecase.UnlikeTrackUseCase
-import dev.stranik.musicapp.presentation.ui.screen.ArtistDetailScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,7 +67,7 @@ class ArtistDetailViewModel(
 					loadTracks(artist.topTracks ?: emptyList())
 				}
 				.onFailure { error ->
-					_uiState.update { it.copy(isLoading = false, error = "Не удалось загрузить плейлист") }
+					_uiState.update { it.copy(isLoading = false, error = "Не удалось загрузить данные артиста") }
 				}
 
 			getUserPlaylistsUseCase()
@@ -78,7 +77,7 @@ class ArtistDetailViewModel(
 						playlists = playlists,
 					)
 				}
-			};
+			}
 		}
 	}
 
@@ -128,11 +127,11 @@ class ArtistDetailViewModel(
 	}
 
 	companion object {
-		fun getViewModelFactory(artistId: String): ViewModelProvider.Factory = viewModelFactory {
+		fun getViewModelFactory(context: Context, artistId: String): ViewModelProvider.Factory = viewModelFactory {
 			initializer {
-				val artistRepository = Creator.provideArtistRepository()
-				val trackRepository = Creator.provideTrackRepository()
-				val libraryRepository = Creator.provideLibraryRepository()
+				val artistRepository = Creator.provideArtistRepository(context)
+				val trackRepository = Creator.provideTrackRepository(context)
+				val libraryRepository = Creator.provideLibraryRepository(context)
 
 				val getArtist = Creator.provideGetArtist(artistRepository)
 				val getTrackUseCase = Creator.provideGetTrack(trackRepository)
