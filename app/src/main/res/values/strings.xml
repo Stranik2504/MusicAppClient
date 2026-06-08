@@ -1,10 +1,96 @@
 <resources>
     <string name="app_name">MusicApp</string>
-    <string name="cover_name">Обложка %s</string>
+    <string name="cover_name">Обложка %1$s</string>
     <string name="pause">Пауза</string>
-    <string name="play">Возпроизвести</string>
+    <string name="play">Воспроизвести</string>
     <string name="next">Следующий</string>
     <string name="liked_track">Любимый трек</string>
     <string name="options">Опции</string>
     <string name="previous">Предыдущий</string>
+
+    <!-- Home -->
+    <string name="welcome">Добро пожаловать</string>
+    <string name="home_tab">Главная</string>
+    <string name="recommended_section">Рекомендуем</string>
+    <string name="recently_played_section">Недавно прослушанное</string>
+    <string name="popular_artists_section">Популярные артисты</string>
+    <string name="recommended_tracks_section">Рекомендуемые треки</string>
+    <string name="loading_error">Ошибка загрузки</string>
+    <string name="retry">Повторить</string>
+
+    <!-- Library -->
+    <string name="library_title">Медиатека</string>
+    <string name="library_tab">Медиатека</string>
+    <string name="create_playlist_cd">Создать плейлист</string>
+    <string name="no_playlists_message">У вас пока нет плейлистов</string>
+    <string name="private_cd">Приватный</string>
+    <string name="track_count_format">%1$d треков</string>
+    <string name="no_liked_tracks_message">Вы ещё не добавили треки в любимые</string>
+    <string name="new_playlist_dialog_title">Новый плейлист</string>
+    <string name="playlist_name_placeholder">Название плейлиста</string>
+    <string name="create_button">Создать</string>
+    <string name="cancel_button">Отмена</string>
+    <string name="playlists_tab">Плейлисты</string>
+    <string name="liked_tracks_tab">Любимые треки</string>
+
+    <!-- Search -->
+    <string name="search_title">Поиск</string>
+    <string name="search_tab">Поиск</string>
+    <string name="search_placeholder">Треки, артисты, альбомы...</string>
+    <string name="clear_search_cd">Очистить</string>
+    <string name="tracks_section">Треки</string>
+    <string name="artists_section">Артисты</string>
+    <string name="albums_section">Альбомы</string>
+    <string name="search_idle_message">Введите название трека, артиста или альбома</string>
+    <string name="search_empty_message">По запросу «%1$s» ничего не найдено</string>
+    <string name="error_format">Ошибка: %1$s</string>
+
+    <!-- Auth -->
+    <string name="login_title">Войти</string>
+    <string name="login_button">Войти</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Пароль</string>
+    <string name="registration_button">Регистрация</string>
+    <string name="registration_title">Регистрация</string>
+    <string name="username_label">Имя пользователя</string>
+    <string name="confirm_password_label">Повторите пароль</string>
+    <string name="register_button">Зарегистрироваться</string>
+
+    <!-- Account -->
+    <string name="account_title">Аккаунт</string>
+    <string name="account_tab">Аккаунт</string>
+    <string name="not_authorized_status">Не авторизован</string>
+    <string name="username_format">Имя пользователя: %1$s</string>
+    <string name="email_format">Email: %1$s</string>
+    <string name="edit_button">Редактировать</string>
+    <string name="logout_button">Выйти</string>
+    <string name="change_language">Сменить язык</string>
+
+    <!-- Player -->
+    <string name="collapse_cd">Свернуть</string>
+    <string name="now_playing_title">Сейчас играет</string>
+    <string name="queue_cd">Очередь</string>
+    <string name="album_cover_cd">Обложка альбома</string>
+    <string name="like_cd">Лайк</string>
+    <string name="shuffle_cd">Перемешать</string>
+    <string name="repeat_cd">Повтор</string>
+
+    <!-- Details -->
+    <string name="back_cd">Назад</string>
+    <string name="artist_title">Артист</string>
+    <string name="listeners_count_label">Кол-во прослушиваний</string>
+    <string name="top_tracks_section">Популярные треки</string>
+    <string name="playlist_title">Плейлист</string>
+    <string name="album_title">Альбом</string>
+    <string name="public_status">публичный</string>
+    <string name="private_status">приватный</string>
+    <string name="tracks_title">Треки</string>
+    <string name="empty_playlist_message">В этом плейлисте пока нет треков</string>
+    <string name="try_again_button">Попробовать снова</string>
+
+    <!-- TrackItem -->
+    <string name="remove_from_liked">Удалить из любимых</string>
+    <string name="add_to_liked">В любимые</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="select_playlist">Выберите плейлист</string>
 </resources>

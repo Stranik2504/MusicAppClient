@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,9 +23,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import dev.stranik.musicapp.domain.model.Playlist
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.presentation.ui.component.TrackItem
 import dev.stranik.musicapp.presentation.viewmodel.ArtistDetailViewModel
@@ -51,10 +51,10 @@ fun ArtistDetailScreen(
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				IconButton(onClick = onBack) {
-					Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+					Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_cd))
 				}
 				Text(
-					text = "Артист",
+					text = stringResource(R.string.artist_title),
 					style = MaterialTheme.typography.titleMedium,
 					fontWeight = FontWeight.SemiBold,
 					modifier = Modifier.padding(start = 8.dp)
@@ -66,13 +66,13 @@ fun ArtistDetailScreen(
 			Card(modifier = Modifier.fillMaxWidth()) {
 				Column(modifier = Modifier.padding(16.dp)) {
 					Text(
-						text = state.artist?.name ?: "Артист",
+						text = state.artist?.name ?: stringResource(R.string.artist_title),
 						style = MaterialTheme.typography.headlineMedium,
 						fontWeight = FontWeight.Bold
 					)
 					Spacer(Modifier.height(8.dp))
 					Text(
-						text = state.artist?.monthlyListenersFormatted ?: "Кол-во прослушиваний",
+						text = state.artist?.monthlyListenersFormatted ?: stringResource(R.string.listeners_count_label),
 						style = MaterialTheme.typography.bodyMedium,
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
@@ -88,7 +88,7 @@ fun ArtistDetailScreen(
 		if (state.topTracks.isNotEmpty()) {
 			item {
 				Text(
-					text = "Популярные треки",
+					text = stringResource(R.string.top_tracks_section),
 					style = MaterialTheme.typography.titleLarge,
 					fontWeight = FontWeight.SemiBold
 				)

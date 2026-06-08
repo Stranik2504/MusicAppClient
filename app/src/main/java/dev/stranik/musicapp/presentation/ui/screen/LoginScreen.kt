@@ -16,7 +16,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.presentation.viewmodel.LoginViewModel
 
 @Composable
@@ -34,14 +36,17 @@ fun LoginScreen(
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		Text(text = "Войти", style = MaterialTheme.typography.headlineMedium)
+		Text(
+			text = stringResource(R.string.login_title),
+			style = MaterialTheme.typography.headlineMedium
+		)
 
 		Spacer(modifier = Modifier.height(16.dp))
 
 		OutlinedTextField(
 			value = state.email,
 			onValueChange = viewModel::onEmailChange,
-			label = { Text("Email") }
+			label = { Text(stringResource(R.string.email_label)) }
 		)
 
 		Spacer(modifier = Modifier.height(8.dp))
@@ -49,7 +54,7 @@ fun LoginScreen(
 		OutlinedTextField(
 			value = state.password,
 			onValueChange = viewModel::onPasswordChange,
-			label = { Text("Пароль") }
+			label = { Text(stringResource(R.string.password_label)) }
 		)
 
 		Spacer(modifier = Modifier.height(16.dp))
@@ -59,10 +64,14 @@ fun LoginScreen(
 			Spacer(modifier = Modifier.height(8.dp))
 		}
 
-		Button(onClick = { viewModel.login() }) { Text("Войти") }
+		Button(onClick = { viewModel.login() }) { 
+			Text(stringResource(R.string.login_button)) 
+		}
 
 		Spacer(modifier = Modifier.height(8.dp))
-		Button(onClick = onNavigateToRegistration) { Text("Регистрация") }
+		Button(onClick = onNavigateToRegistration) { 
+			Text(stringResource(R.string.registration_button)) 
+		}
 	}
 
 	LaunchedEffect(state.success) {
@@ -71,4 +80,3 @@ fun LoginScreen(
 		}
 	}
 }
-

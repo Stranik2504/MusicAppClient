@@ -1,6 +1,5 @@
 package dev.stranik.musicapp.presentation.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,8 +44,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Playlist
 import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.presentation.ui.component.TrackItem
@@ -83,7 +84,7 @@ fun LibraryScreen(
                 Tab(
                     selected = selectedTab == tab,
                     onClick = { selectedTab = tab },
-                    text = { Text(tab.label) }
+                    text = { Text(stringResource(tab.labelRes)) }
                 )
             }
         }
@@ -126,12 +127,12 @@ private fun LibraryHeader(onCreatePlaylist: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Медиатека",
+            text = stringResource(R.string.library_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
         IconButton(onClick = onCreatePlaylist) {
-            Icon(Icons.Default.Add, contentDescription = "Создать плейлист")
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.create_playlist_cd))
         }
     }
 }
@@ -144,7 +145,7 @@ private fun PlaylistsTab(
     if (playlists.isEmpty()) {
         EmptyState(
             icon = Icons.Default.LibraryMusic,
-            message = "У вас пока нет плейлистов"
+            message = stringResource(R.string.no_playlists_message)
         )
         return
     }
@@ -174,12 +175,12 @@ private fun PlaylistItem(playlist: Playlist, onClick: () -> Unit) {
                 if (!playlist.isPublic) {
                     Icon(
                         imageVector = Icons.Default.Lock,
-                        contentDescription = "Приватный",
+                        contentDescription = stringResource(R.string.private_cd),
                         modifier = Modifier.size(14.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Text("${playlist.trackCount} треков")
+                Text(stringResource(R.string.track_count_format, playlist.trackCount))
             }
         },
         leadingContent = {
@@ -215,7 +216,7 @@ private fun LikedTracksTab(
     if (tracks.isEmpty()) {
         EmptyState(
             icon = Icons.Default.FavoriteBorder,
-            message = "Вы ещё не добавили треки в любимые"
+            message = stringResource(R.string.no_liked_tracks_message)
         )
         return
     }
@@ -272,7 +273,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
             color = MaterialTheme.colorScheme.error
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = onRetry) { Text("Повторить") }
+        Button(onClick = onRetry) { Text(stringResource(R.string.retry)) }
     }
 }
 
@@ -283,12 +284,12 @@ private fun CreatePlaylistDialog(onConfirm: (String) -> Unit, onDismiss: () -> U
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Новый плейлист") },
+        title = { Text(stringResource(R.string.new_playlist_dialog_title)) },
         text = {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                placeholder = { Text("Название плейлиста") },
+                placeholder = { Text(stringResource(R.string.playlist_name_placeholder)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -297,10 +298,10 @@ private fun CreatePlaylistDialog(onConfirm: (String) -> Unit, onDismiss: () -> U
             TextButton(
                 onClick = { if (title.isNotBlank()) onConfirm(title.trim()) },
                 enabled = title.isNotBlank()
-            ) { Text("Создать") }
+            ) { Text(stringResource(R.string.create_button)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Отмена") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) }
         }
     )
 }

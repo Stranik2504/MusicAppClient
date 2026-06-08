@@ -1,10 +1,96 @@
 <resources>
     <string name="app_name">MusicApp</string>
-    <string name="cover_name">Обложка %s</string>
-    <string name="pause">Пауза</string>
-    <string name="play">Возпроизвести</string>
-    <string name="next">Возпроизвести</string>
-    <string name="liked_track">Любимый трек</string>
-    <string name="options">Опции</string>
+    <string name="cover_name">Cover %1$s</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="next">Next</string>
+    <string name="liked_track">Liked track</string>
+    <string name="options">Options</string>
     <string name="previous">Previous</string>
+
+    <!-- Home -->
+    <string name="welcome">Welcome</string>
+    <string name="home_tab">Home</string>
+    <string name="recommended_section">Recommended</string>
+    <string name="recently_played_section">Recently played</string>
+    <string name="popular_artists_section">Popular artists</string>
+    <string name="recommended_tracks_section">Recommended tracks</string>
+    <string name="loading_error">Loading error</string>
+    <string name="retry">Retry</string>
+
+    <!-- Library -->
+    <string name="library_title">Library</string>
+    <string name="library_tab">Library</string>
+    <string name="create_playlist_cd">Create playlist</string>
+    <string name="no_playlists_message">You don\'t have any playlists yet</string>
+    <string name="private_cd">Private</string>
+    <string name="track_count_format">%1$d tracks</string>
+    <string name="no_liked_tracks_message">You haven\'t added any tracks to favorites yet</string>
+    <string name="new_playlist_dialog_title">New playlist</string>
+    <string name="playlist_name_placeholder">Playlist name</string>
+    <string name="create_button">Create</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="playlists_tab">Playlists</string>
+    <string name="liked_tracks_tab">Liked tracks</string>
+
+    <!-- Search -->
+    <string name="search_title">Search</string>
+    <string name="search_tab">Search</string>
+    <string name="search_placeholder">Tracks, artists, albums…</string>
+    <string name="clear_search_cd">Clear</string>
+    <string name="tracks_section">Tracks</string>
+    <string name="artists_section">Artists</string>
+    <string name="albums_section">Albums</string>
+    <string name="search_idle_message">Enter track, artist or album name</string>
+    <string name="search_empty_message">Nothing found for \"%1$s\"</string>
+    <string name="error_format">Error: %1$s</string>
+
+    <!-- Auth -->
+    <string name="login_title">Log In</string>
+    <string name="login_button">Log In</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="registration_button">Registration</string>
+    <string name="registration_title">Registration</string>
+    <string name="username_label">Username</string>
+    <string name="confirm_password_label">Confirm password</string>
+    <string name="register_button">Register</string>
+
+    <!-- Account -->
+    <string name="account_title">Account</string>
+    <string name="account_tab">Account</string>
+    <string name="not_authorized_status">Not authorized</string>
+    <string name="username_format">Username: %1$s</string>
+    <string name="email_format">Email: %1$s</string>
+    <string name="edit_button">Edit</string>
+    <string name="logout_button">Logout</string>
+    <string name="change_language">Change language</string>
+
+    <!-- Player -->
+    <string name="collapse_cd">Collapse</string>
+    <string name="now_playing_title">Now playing</string>
+    <string name="queue_cd">Queue</string>
+    <string name="album_cover_cd">Album cover</string>
+    <string name="like_cd">Like</string>
+    <string name="shuffle_cd">Shuffle</string>
+    <string name="repeat_cd">Repeat</string>
+
+    <!-- Details -->
+    <string name="back_cd">Back</string>
+    <string name="artist_title">Artist</string>
+    <string name="listeners_count_label">Monthly listeners</string>
+    <string name="top_tracks_section">Popular tracks</string>
+    <string name="playlist_title">Playlist</string>
+    <string name="album_title">Album</string>
+    <string name="public_status">public</string>
+    <string name="private_status">private</string>
+    <string name="tracks_title">Tracks</string>
+    <string name="empty_playlist_message">No tracks in this playlist yet</string>
+    <string name="try_again_button">Try again</string>
+
+    <!-- TrackItem -->
+    <string name="remove_from_liked">Remove from favorites</string>
+    <string name="add_to_liked">To favorites</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="select_playlist">Select playlist</string>
 </resources>

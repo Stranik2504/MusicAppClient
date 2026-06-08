@@ -1,11 +1,13 @@
 package dev.stranik.musicapp.presentation.viewmodel
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import dev.stranik.musicapp.R
 import kotlinx.coroutines.async
 import dev.stranik.musicapp.domain.Creator
 import dev.stranik.musicapp.domain.model.Playlist
@@ -30,9 +32,9 @@ data class LibraryUiState(
     val error: String? = null
 )
 
-enum class LibraryTab(val label: String) {
-    PLAYLISTS("Плейлисты"),
-    LIKED("Любимые треки")
+enum class LibraryTab(@StringRes val labelRes: Int) {
+    PLAYLISTS(R.string.playlists_tab),
+    LIKED(R.string.liked_tracks_tab)
 }
 
 class LibraryViewModel(

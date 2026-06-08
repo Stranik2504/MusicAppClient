@@ -33,13 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Album
 import dev.stranik.musicapp.domain.model.Track
-import dev.stranik.musicapp.presentation.common.UiText
 import dev.stranik.musicapp.presentation.ui.component.ArtistCard
 import dev.stranik.musicapp.presentation.ui.component.TrackItem
 import dev.stranik.musicapp.presentation.viewmodel.SearchUiState
@@ -61,7 +61,7 @@ fun SearchScreen(
             .padding(top = 16.dp)
     ) {
         Text(
-            text = "Поиск",
+            text = stringResource(R.string.search_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -103,12 +103,12 @@ private fun SearchBar(
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
-        placeholder = { Text("Треки, артисты, альбомы...") },
+        placeholder = { Text(stringResource(R.string.search_placeholder)) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
         trailingIcon = {
             if (query.isNotBlank()) {
                 IconButton(onClick = onClear) {
-                    Icon(Icons.Default.Clear, contentDescription = "Очистить")
+                    Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear_search_cd))
                 }
             }
         },
@@ -134,7 +134,7 @@ private fun SearchResultsContent(
         // Треки
         if (state.tracks.isNotEmpty()) {
             item {
-                SearchSectionTitle("Треки")
+                SearchSectionTitle(stringResource(R.string.tracks_section))
             }
             items(state.tracks.take(5), key = { "track_" + it.id }) { track ->
                 TrackItem(
@@ -151,7 +151,7 @@ private fun SearchResultsContent(
         // Артисты
         if (state.artists.isNotEmpty()) {
             item {
-                SearchSectionTitle("Артисты")
+                SearchSectionTitle(stringResource(R.string.artists_section))
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -168,7 +168,7 @@ private fun SearchResultsContent(
 
         // Альбомы
         if (state.albums.isNotEmpty()) {
-            item { SearchSectionTitle("Альбомы") }
+            item { SearchSectionTitle(stringResource(R.string.albums_section)) }
             items(state.albums, key = { "album_" + it.id }) { album ->
                 AlbumListItem(album = album, modifier = Modifier.padding(horizontal = 16.dp))
             }
@@ -198,10 +198,10 @@ private fun AlbumListItem(album: Album, modifier: Modifier = Modifier) {
         Card(shape = RoundedCornerShape(8.dp), modifier = Modifier.size(52.dp)) {
             AsyncImage(
                 model = album.coverUrl,
-                contentDescription = UiText.StringResource(
+                contentDescription = stringResource(
                     R.string.cover_name,
                     album.title
-                ).asString(),
+                ),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -230,7 +230,7 @@ private fun SearchIdleContent() {
             )
             Spacer(Modifier.height(16.dp))
             Text(
-                "Введите название трека, артиста или альбома",
+                stringResource(R.string.search_idle_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -261,7 +261,7 @@ private fun SearchEmptyContent(query: String) {
             )
             Spacer(Modifier.height(16.dp))
             Text(
-                "По запросу «$query» ничего не найдено",
+                stringResource(R.string.search_empty_message, query),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -277,7 +277,7 @@ private fun SearchErrorContent(message: String) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            "Ошибка: $message",
+            stringResource(R.string.error_format, message),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.error
         )

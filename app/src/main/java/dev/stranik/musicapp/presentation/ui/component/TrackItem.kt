@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -14,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,7 +46,6 @@ import coil.compose.AsyncImage
 import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Playlist
 import dev.stranik.musicapp.domain.model.Track
-import dev.stranik.musicapp.presentation.common.UiText
 
 @Composable
 fun TrackItem(
@@ -103,7 +103,7 @@ fun TrackItem(
                 if (track.isLiked) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
-                        contentDescription = UiText.StringResource(R.string.liked_track).asString(),
+                        contentDescription = stringResource(R.string.liked_track),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
@@ -118,7 +118,7 @@ fun TrackItem(
                     IconButton(onClick = { showMenu = true }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = UiText.StringResource(R.string.options).asString(),
+                            contentDescription = stringResource(R.string.options),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
@@ -129,7 +129,12 @@ fun TrackItem(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(if (track.isLiked) "Удалить из любимых" else "В любимые") },
+                            text = { 
+                                Text(
+                                    if (track.isLiked) stringResource(R.string.remove_from_liked) 
+                                    else stringResource(R.string.add_to_liked)
+                                ) 
+                            },
                             leadingIcon = {
                                 Icon(
                                     imageVector = if (track.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -142,9 +147,9 @@ fun TrackItem(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Добавить в плейлист") },
+                            text = { Text(stringResource(R.string.add_to_playlist)) },
                             leadingIcon = {
-                                Icon(imageVector = Icons.Default.PlaylistAdd, contentDescription = null)
+                                Icon(imageVector = Icons.AutoMirrored.Filled.PlaylistAdd, contentDescription = null)
                             },
                             onClick = {
                                 showPlaylistDialog = true
@@ -167,10 +172,10 @@ private fun AddToPlaylistDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Выберите плейлист") },
+        title = { Text(stringResource(R.string.select_playlist)) },
         text = {
             if (playlists.isEmpty()) {
-                Text("У вас пока нет плейлистов")
+                Text(stringResource(R.string.no_playlists_message))
             } else {
                 LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
                     items(playlists) { playlist ->
@@ -184,7 +189,7 @@ private fun AddToPlaylistDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Отмена") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) }
         }
     )
 }
@@ -209,7 +214,7 @@ fun MakeIcon(track: Track) {
 
     AsyncImage(
         model = track.coverUrl,
-        contentDescription = UiText.StringResource(R.string.cover_name, track.title).asString(),
+        contentDescription = stringResource(R.string.cover_name, track.title),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(48.dp)

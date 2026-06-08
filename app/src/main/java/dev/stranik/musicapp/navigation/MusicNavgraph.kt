@@ -1,6 +1,7 @@
 package dev.stranik.musicapp.navigation
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -28,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.Creator
 import dev.stranik.musicapp.presentation.ui.screen.AccountScreen
 import dev.stranik.musicapp.presentation.ui.screen.ArtistDetailScreen
@@ -70,15 +73,15 @@ sealed class Screen(val route: String) {
 
 private data class BottomNavItem(
     val screen: Screen,
-    val label: String,
+    @StringRes val labelRes: Int,
     val icon: ImageVector
 )
 
 private val bottomNavItems = listOf(
-    BottomNavItem(Screen.Home, "Главная", Icons.Default.Home),
-    BottomNavItem(Screen.Search, "Поиск", Icons.Default.Search),
-    BottomNavItem(Screen.Library, "Медиатека", Icons.Default.LibraryMusic),
-    BottomNavItem(Screen.Account, "Аккаунт", Icons.Default.AccountCircle),
+    BottomNavItem(Screen.Home, R.string.home_tab, Icons.Default.Home),
+    BottomNavItem(Screen.Search, R.string.search_tab, Icons.Default.Search),
+    BottomNavItem(Screen.Library, R.string.library_tab, Icons.Default.LibraryMusic),
+    BottomNavItem(Screen.Account, R.string.account_tab, Icons.Default.AccountCircle),
 )
 
 private val authRoutes = setOf(Screen.Login.route, Screen.Registration.route)
@@ -271,6 +274,7 @@ private fun BottomNavBar(navController: NavController) {
 
     NavigationBar {
         bottomNavItems.forEach { item ->
+            val label = stringResource(item.labelRes)
             NavigationBarItem(
                 selected = currentRoute == item.screen.route,
                 onClick = {
@@ -282,8 +286,8 @@ private fun BottomNavBar(navController: NavController) {
                         }
                     }
                 },
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) }
+                icon = { Icon(item.icon, contentDescription = label) },
+                label = { Text(label) }
             )
         }
     }
