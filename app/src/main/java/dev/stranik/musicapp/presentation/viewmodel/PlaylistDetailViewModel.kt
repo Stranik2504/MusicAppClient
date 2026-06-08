@@ -100,7 +100,11 @@ class PlaylistDetailViewModel(
 
         trackIds.forEach { id ->
             getTrackUseCase(id.toLong())
-                .onSuccess { if (!tracks.any { it.id != id }) tracks.add(it) }
+                .onSuccess { track ->
+                    if (tracks.none { it.id == track.id }) {
+                        tracks.add(track)
+                    }
+                }
                 .onFailure { hasError = true }
         }
 

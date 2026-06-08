@@ -29,8 +29,3 @@ private fun formatDuration(seconds: Int): String {
     val remainingSeconds = seconds % 60
     return "%d:%02d".format(minutes, remainingSeconds)
 }
-
-class LibraryUiMapper {
-    fun toPlaylist(playlist: Playlist): Playlist = playlist
-    fun toTrack(track: Track): Track = track
-}

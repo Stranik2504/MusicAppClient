@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed class SearchUiState {
@@ -130,8 +129,8 @@ class SearchViewModel(
         fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val searchRepository = Creator.provideSearchRepository()
-                val trackRepository = Creator.provideTrackRepository()
-                val libraryRepository = Creator.provideLibraryRepository()
+                val trackRepository = Creator.provideTrackRepository(context)
+                val libraryRepository = Creator.provideLibraryRepository(context)
 
                 val search = Creator.provideSearch(searchRepository)
                 val getUserPlaylistsUseCase = Creator.provideGetUserPlaylists(libraryRepository)

@@ -20,8 +20,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.presentation.ui.component.AlbumCard
 import dev.stranik.musicapp.presentation.ui.component.ArtistCard
@@ -74,7 +76,7 @@ private fun HomeContent(
         item {
             Spacer(Modifier.height(16.dp))
             Text(
-                text = "Добро пожаловать",
+                text = stringResource(R.string.welcome),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -84,7 +86,7 @@ private fun HomeContent(
         // Рекомендованные альбомы
         if (state.featuredAlbums.isNotEmpty()) {
             item {
-                SectionTitle(title = "Рекомендуем")
+                SectionTitle(title = stringResource(R.string.recommended_section))
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -101,7 +103,7 @@ private fun HomeContent(
 
         // Недавно воспроизведённые
         if (state.recentlyPlayed.isNotEmpty()) {
-            item { SectionTitle(title = "Недавно прослушанное") }
+            item { SectionTitle(title = stringResource(R.string.recently_played_section)) }
             items(state.recentlyPlayed.take(5), key = { it.id }) { track ->
                 TrackItem(
                     track = track,
@@ -117,7 +119,7 @@ private fun HomeContent(
         // Популярные артисты
         if (state.popularArtists.isNotEmpty()) {
             item {
-                SectionTitle(title = "Популярные артисты")
+                SectionTitle(title = stringResource(R.string.popular_artists_section))
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -134,7 +136,7 @@ private fun HomeContent(
 
         // Рекомендуемые треки
         if (state.recommendationTracks.isNotEmpty()) {
-            item { SectionTitle(title = "Рекомендуемые треки") }
+            item { SectionTitle(title = stringResource(R.string.recommended_tracks_section)) }
             items(state.recommendationTracks.take(20), key = { it.id }) { track ->
                 TrackItem(
                     track = track,
@@ -176,7 +178,7 @@ private fun ErrorContent(message: String, onRetry: () -> Unit, onDismiss: () -> 
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Ошибка загрузки",
+            text = stringResource(R.string.loading_error),
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(Modifier.height(8.dp))
@@ -186,6 +188,6 @@ private fun ErrorContent(message: String, onRetry: () -> Unit, onDismiss: () -> 
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(24.dp))
-        Button(onClick = onRetry) { Text("Повторить") }
+        Button(onClick = onRetry) { Text(stringResource(R.string.retry)) }
     }
 }

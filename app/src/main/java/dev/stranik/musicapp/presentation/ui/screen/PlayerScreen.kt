@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Shuffle
@@ -44,10 +43,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.domain.model.Track
 import dev.stranik.musicapp.presentation.viewmodel.PlayerViewModel
 import dev.stranik.musicapp.presentation.viewmodel.RepeatMode
@@ -135,16 +136,16 @@ private fun PlayerTopBar(onBack: () -> Unit) {
         IconButton(onClick = onBack) {
             Icon(
                 Icons.Rounded.KeyboardArrowDown,
-                contentDescription = "Свернуть",
+                contentDescription = stringResource(R.string.collapse_cd),
                 modifier = Modifier.size(32.dp)
             )
         }
         Text(
-            text = "Сейчас играет",
+            text = stringResource(R.string.now_playing_title),
             style = MaterialTheme.typography.labelSmall
         )
         IconButton(onClick = { /* открыть очередь */ }) {
-            Icon(Icons.AutoMirrored.Filled.QueueMusic, contentDescription = "Очередь")
+            Icon(Icons.AutoMirrored.Filled.QueueMusic, contentDescription = stringResource(R.string.queue_cd))
         }
     }
 }
@@ -162,7 +163,7 @@ private fun AlbumArtwork(
     )
     AsyncImage(
         model = coverUrl,
-        contentDescription = "Обложка альбома",
+        contentDescription = stringResource(R.string.album_cover_cd),
         contentScale = ContentScale.Crop,
         modifier = modifier
             .graphicsLayer { scaleX = scale; scaleY = scale }
@@ -198,7 +199,7 @@ private fun TrackInfo(
         IconButton(onClick = onLike) {
             Icon(
                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = "Лайк",
+                contentDescription = stringResource(R.string.like_cd),
                 tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -248,7 +249,7 @@ private fun PlayerControls(
         IconButton(onClick = onShuffle) {
             Icon(
                 imageVector = Icons.Default.Shuffle,
-                contentDescription = "Перемешать",
+                contentDescription = stringResource(R.string.shuffle_cd),
                 tint = if (isShuffled) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -257,7 +258,7 @@ private fun PlayerControls(
         IconButton(onClick = onSkipPrevious, modifier = Modifier.size(48.dp)) {
             Icon(
                 Icons.Default.SkipPrevious,
-                contentDescription = "Предыдущий",
+                contentDescription = stringResource(R.string.previous),
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -269,7 +270,7 @@ private fun PlayerControls(
         ) {
             Icon(
                 imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                contentDescription = if (isPlaying) "Пауза" else "Воспроизвести",
+                contentDescription = if (isPlaying) stringResource(R.string.pause) else stringResource(R.string.play),
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -277,7 +278,7 @@ private fun PlayerControls(
         IconButton(onClick = onSkipNext, modifier = Modifier.size(48.dp)) {
             Icon(
                 Icons.Default.SkipNext,
-                contentDescription = "Следующий",
+                contentDescription = stringResource(R.string.next),
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -288,7 +289,7 @@ private fun PlayerControls(
                     RepeatMode.ONE -> Icons.Default.RepeatOne
                     else -> Icons.Default.Repeat
                 },
-                contentDescription = "Повтор",
+                contentDescription = stringResource(R.string.repeat_cd),
                 tint = if (repeatMode != RepeatMode.OFF) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.onSurfaceVariant
             )

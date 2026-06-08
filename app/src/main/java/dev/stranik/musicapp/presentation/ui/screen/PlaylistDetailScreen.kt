@@ -26,9 +26,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.presentation.ui.component.TrackItem
 import dev.stranik.musicapp.presentation.viewmodel.PlaylistDetailViewModel
 
@@ -52,10 +54,13 @@ fun PlaylistDetailScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
+                            contentDescription = stringResource(R.string.back_cd)
+                        )
                     }
                     Text(
-                        text = if (state.isPlaylist) "Плейлист" else "Альбом",
+                        text = if (state.isPlaylist) stringResource(R.string.playlist_title) else stringResource(R.string.album_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 8.dp)
@@ -76,11 +81,17 @@ fun PlaylistDetailScreen(
 
                             var type = ""
 
-                            if (state.isPlaylist)
-                                type = " · " + if (playlist.isPublic) "публичный" else "приватный"
+                            if (state.isPlaylist) {
+                                val status = if (playlist.isPublic) {
+                                    stringResource(R.string.public_status)
+                                } else {
+                                    stringResource(R.string.private_status)
+                                }
+                                type = " · $status"
+                            }
 
                             Text(
-                                text = "${playlist.trackCount} треков${type}",
+                                text = stringResource(R.string.track_count_format, playlist.trackCount) + type,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -101,7 +112,7 @@ fun PlaylistDetailScreen(
             if (state.tracks.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Треки",
+                        text = stringResource(R.string.tracks_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -124,7 +135,7 @@ fun PlaylistDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "В этом плейлисте пока нет треков",
+                            text = stringResource(R.string.empty_playlist_message),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -155,7 +166,7 @@ fun PlaylistDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { viewModel.loadPlaylist() }) {
-                    Text("Попробовать снова")
+                    Text(stringResource(R.string.try_again_button))
                 }
             }
         }

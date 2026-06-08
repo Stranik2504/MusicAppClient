@@ -105,7 +105,7 @@ class HomeViewModel(
                         playlists = playlists,
                     )
                 }
-            };
+            }
         }
     }
 
@@ -142,9 +142,9 @@ class HomeViewModel(
     companion object {
         fun getViewModelFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val recommendationRepository = Creator.provideRecommendationRepository()
-                val trackRepository = Creator.provideTrackRepository()
-                val libraryRepository = Creator.provideLibraryRepository()
+                val recommendationRepository = Creator.provideRecommendationRepository(context)
+                val trackRepository = Creator.provideTrackRepository(context)
+                val libraryRepository = Creator.provideLibraryRepository(context)
 
                 val getFeaturedAlbums = Creator.provideGetFeaturedAlbums(recommendationRepository)
                 val getRecentlyPlayed = Creator.provideGetRecentlyPlayed(recommendationRepository)

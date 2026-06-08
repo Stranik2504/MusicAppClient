@@ -1,6 +1,6 @@
 package dev.stranik.musicapp.presentation.ui.screen
 
-import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,9 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import coil.compose.AsyncImage
+import dev.stranik.musicapp.R
 import dev.stranik.musicapp.presentation.viewmodel.AccountUiState
 import dev.stranik.musicapp.presentation.viewmodel.AccountViewModel
 
@@ -61,23 +64,40 @@ fun AccountScreen(
 		Spacer(modifier = Modifier.height(24.dp))
 
 		Text(
-			text = (if (state.isLogged) "Аккаунт" else "Не авторизован"),
+			text = if (state.isLogged) stringResource(R.string.account_title) else stringResource(R.string.not_authorized_status),
 			style = MaterialTheme.typography.headlineMedium,
 			modifier = Modifier.align(Alignment.CenterHorizontally)
 		)
 
 		Spacer(modifier = Modifier.height(16.dp))
-		Text(text = "Username: ${state.username}", modifier = Modifier.align(Alignment.CenterHorizontally))
+		Text(
+			text = stringResource(R.string.username_format, state.username),
+			modifier = Modifier.align(Alignment.CenterHorizontally)
+		)
 
 		Spacer(modifier = Modifier.height(16.dp))
-		Text(text = "Email: ${state.email}", modifier = Modifier.align(Alignment.CenterHorizontally))
+		Text(
+			text = stringResource(R.string.email_format, state.email),
+			modifier = Modifier.align(Alignment.CenterHorizontally)
+		)
 
 		Spacer(modifier = Modifier.height(24.dp))
 
-		Button(
+		/*Button(
 			onClick = onEdit,
 			modifier = Modifier.align(Alignment.CenterHorizontally)
-		) { Text("Редактировать") }
+		) { Text(stringResource(R.string.edit_button)) }
+
+		Spacer(modifier = Modifier.height(12.dp))*/
+
+		Button(
+			onClick = {
+				val currentLocale = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+				val newLocale = if (currentLocale.startsWith("ru")) "en" else "ru"
+				AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(newLocale))
+			},
+			modifier = Modifier.align(Alignment.CenterHorizontally)
+		) { Text(stringResource(R.string.change_language)) }
 
 		Spacer(modifier = Modifier.height(12.dp))
 
@@ -87,7 +107,7 @@ fun AccountScreen(
 				onLogout()
 			},
 			modifier = Modifier.align(Alignment.CenterHorizontally)
-		) { Text("Выйти") }
+		) { Text(stringResource(R.string.logout_button)) }
 	}
 }
 
